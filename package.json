@@ -1,0 +1,19 @@
+{
+  "name": "reseau-social",
+  "version": "1.0.0",
+  "description": "ECO+ SOCIAL NETWORKING",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "author": "arnaud pelissier",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "ejs": "^3.1.3",
+    "express": "^4.17.1",
+    "mysql2": "^2.1.0",
+    "nodemon": "^2.0.4"
+  }
+}
