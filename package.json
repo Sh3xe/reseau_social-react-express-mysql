@@ -2,10 +2,10 @@
   "name": "reseau-social",
   "version": "1.0.0",
   "description": "ECO+ SOCIAL NETWORKING",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "nodemon app.js",
-    "start": "node app.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
   "author": "arnaud pelissier",
   "license": "MIT",

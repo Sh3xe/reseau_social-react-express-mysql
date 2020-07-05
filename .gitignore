@@ -1,3 +1,4 @@
 dev_files
 node_modules
-public/uploads/*
+server/public/uploads/*
+server/database/test.js
