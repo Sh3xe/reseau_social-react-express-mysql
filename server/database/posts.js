@@ -7,6 +7,11 @@ async function searchPost(params = {
     search_query: null,
     category: null
 }) {
+    if(!params.start || !params.step) {
+        params.start = 0;
+        params.step = 15;
+    }
+
     if(params.search_query || params.category) {
 
         let params_array = [];
@@ -23,17 +28,18 @@ async function searchPost(params = {
         if(params.search_query) {
             keywords = params.search_query.split(/\s|;|:|,/g);
             search_command = "";
-    
+
             for(let i = 0; i < keywords.length; i++) {
                 if(i !== 0) search_command += " OR";
-                search_command += " post_title LIKE '%?%'";
+                keywords[i] = `%${keywords[i]}%`;
+                search_command += " post_title LIKE ?";
             }
             params_array.push(...keywords);
         }
-
+        
         let query = `
             SELECT * FROM rs_posts
-            WHERE ${category_command || ""} 
+            WHERE ${category_command || ""}
             ${ (category_command && search_command) ? "AND" : "" }
             (${search_command || ""})
             LIMIT ?, ?`;
@@ -105,5 +111,6 @@ module.exports = {
     getPostsOf,
     addPost,
     editPost,
-    deletePost
+    deletePost,
+    searchPost
 }
