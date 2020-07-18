@@ -22,8 +22,8 @@ async function sendRequest(from, to) {
 
     const query = `
         INSERT INTO rs_relations(relation_user1, relation_user2, relation_status)
-        VALUES(?, ?, ?)
-    `;
+        VALUES(?, ?, ?)`;
+        
     return await db.exec(query, [from, to, "pending"]);
 }
 
@@ -39,7 +39,8 @@ async function acceptRequest(from, to) {
     return db.exec(query, [from, to]);
 }
 
-async function removeFriend(from, to) {
+
+async function removeRelation(from, to) {
     const query = `
         DELETE FROM rs_relations
         WHERE relation_user1 = ? AND relation_user2 = ?
@@ -48,14 +49,21 @@ async function removeFriend(from, to) {
     return db.exec(query, [from, to, from, to]);
 }
 
-async function getFriendsOf(id) {
+/*async function getFriendsOf(id) {
     const query = `
-        SELECT user_id, user_link, user_name, user_registration, user_status, user_grade`;
-}
+        SELECT user_link, user_name, user_registration, user_status, user_grade
+        FROM rs_users LEFT JOIN rs_relations
+        ON  rs_users.user_id = rs_relations.relation_user1 
+        AND rs_users.user_id = rs_relations.relation_user2 
+        WHERE (rs_relations.relation_user1 = ? OR rs_relations.relation_user2 = ?)
+        AND rs_relations.relation_status = "friend" `;
+    
+    return db.exec(query, [id, id]);
+}*/
 
 module.exports = {
     sendRequest,
     relationExists,
     acceptRequest,
-    removeFriend
+    removeRelation
 }

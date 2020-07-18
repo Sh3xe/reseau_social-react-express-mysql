@@ -1,6 +1,6 @@
 "use strict";
 
-const config = require("./config.js");
+const config = require("../config.js");
 const mysql = require("mysql2");
 
 class DataBase {
