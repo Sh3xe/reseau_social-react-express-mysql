@@ -1,18 +1,14 @@
 "use strict";
-let db = require("./DatabaseManager");
+const db = require("./DatabaseManager");
 
-async function searchPost(params = {
-    start: 0,
-    step: 15,
-    search_query: null,
-    category: null
-}) {
-    if(!params.start || !params.step) {
-        params.start = 0;
-        params.step = 15;
+async function searchPost({search_query, category, start, step}) {
+    // Giving default values for the params object
+    if(!start || !step) {
+        start = 0;
+        step = 15;
     }
 
-    if(params.search_query || params.category) {
+    if(search_query || category) {
 
         let params_array = [];
         
@@ -20,15 +16,16 @@ async function searchPost(params = {
         let search_command = null;
         let category_command = null;
         
-        if(params.category) {
+        if(category) {
             category_command = "post_category = ?";
-            params_array.push(params.category);
+            params_array.push(category);
         }
 
-        if(params.search_query) {
-            keywords = params.search_query.split(/\s|;|:|,/g);
+        if(search_query) {
+            keywords = search_query.split(/\s|;|:|,/g);
             search_command = "";
 
+            //[a, b] => "post_title like a OR post_title like b"
             for(let i = 0; i < keywords.length; i++) {
                 if(i !== 0) search_command += " OR";
                 keywords[i] = `%${keywords[i]}%`;
@@ -36,7 +33,12 @@ async function searchPost(params = {
             }
             params_array.push(...keywords);
         }
-        
+
+        /* QUERY:
+            if there is a category_command, we add it
+            if there is a search_command, we ad it.
+            we add an "AND" between them if there is both
+        */
         let query = `
             SELECT * FROM rs_posts
             WHERE ${category_command || ""}
@@ -44,7 +46,8 @@ async function searchPost(params = {
             (${search_command || ""})
             LIMIT ?, ?`;
 
-        params_array.push(params.start, params.step)
+        //We add the start / step at the end
+        params_array.push(start, step)
 
         return await db.exec(query, params_array);     
     } else {
@@ -52,7 +55,7 @@ async function searchPost(params = {
             SELECT * FROM rs_posts
             LIMIT ?, ?`;
         
-        return await db.exec(query, [params.start, params.step]);
+        return await db.exec(query, [start, step]);
     }
 }
 
@@ -69,11 +72,11 @@ async function getPostById(id) {
 
 async function getPostsOf(id) {
     const query = `
-    SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, user_name, user_link
-    FROM rs_posts
-    INNER JOIN rs_users
-    ON rs_posts.post_user = rs_users.user_id
-    WHERE user_id = ?`;
+        SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, user_name, user_link
+        FROM rs_posts
+        INNER JOIN rs_users
+        ON rs_posts.post_user = rs_users.user_id
+        WHERE user_id = ?`;
 
     return await db.exec(query, [id], true);
 }
@@ -86,22 +89,21 @@ async function addPost(title, content, user_id) {
     return await db.exec(query, [title, content, user_id]);
 }
 
-async function editPost(title, content, user_id, post_id) {
+async function editPost(title, content, post_id) {
     const query = `
         UPDATE rs_posts SET
         post_title = ?,
         post_content = ?,
         post_edit_date = NOW()
-        WHERE post_id = ? AND post_user = ?`;
+        WHERE post_id = ?`;
 
-    return db.exec(query, [title, content, post_id, user_id]);
+    return db.exec(query, [title, content, post_id]);
 }
 
-async function deletePost(post_id, user_id) {
+async function deletePost(post_id) {
     const query = `
         DELETE FROM rs_posts
-        WHERE post_id = ?
-        AND post_user = ?`;
+        WHERE post_id = ?`;
     
     return db.exec(query, [post_id, user_id]);
 }

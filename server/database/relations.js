@@ -1,5 +1,5 @@
 "use strict";
-let db = require("./DatabaseManager");
+const db = require("./DatabaseManager");
 
 async function relationExists(u1, u2, order_matter = false) {
     // if the order matter, we select only if the From user sent the request
@@ -49,7 +49,7 @@ async function removeRelation(from, to) {
     return db.exec(query, [from, to, from, to]);
 }
 
-/*async function getFriendsOf(id) {
+/*async function getFriendsOf(user_id) {
     const query = `
         SELECT user_link, user_name, user_registration, user_status, user_grade
         FROM rs_users LEFT JOIN rs_relations
@@ -61,9 +61,10 @@ async function removeRelation(from, to) {
     return db.exec(query, [id, id]);
 }*/
 
+//async function getRequestsOf(user_id)
+
 module.exports = {
     sendRequest,
-    relationExists,
     acceptRequest,
     removeRelation
 }
