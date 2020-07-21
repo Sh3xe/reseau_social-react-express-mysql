@@ -39,7 +39,6 @@ async function acceptRequest(from, to) {
     return db.exec(query, [from, to]);
 }
 
-
 async function removeRelation(from, to) {
     const query = `
         DELETE FROM rs_relations
@@ -49,22 +48,39 @@ async function removeRelation(from, to) {
     return db.exec(query, [from, to, from, to]);
 }
 
-/*async function getFriendsOf(user_id) {
+async function getFriendsOf(user_id) {
     const query = `
-        SELECT user_link, user_name, user_registration, user_status, user_grade
-        FROM rs_users LEFT JOIN rs_relations
-        ON  rs_users.user_id = rs_relations.relation_user1 
-        AND rs_users.user_id = rs_relations.relation_user2 
-        WHERE (rs_relations.relation_user1 = ? OR rs_relations.relation_user2 = ?)
-        AND rs_relations.relation_status = "friend" `;
-    
-    return db.exec(query, [id, id]);
-}*/
+        SELECT relation_user1, relation_user2, user_id, user_name, user_registration, user_status, user_grade
+        FROM rs_relations FULL JOIN rs_users
+        ON relation_user1 = user_id
+        OR relation_user2 = user_id
+        WHERE (relation_user1 = ? OR relation_user2 = ?)
+        AND relation_status = "friends" 
+        AND user_id != ?`;
 
-//async function getRequestsOf(user_id)
+    
+    return db.exec(query, [user_id, user_id, user_id]);
+}
+
+
+async function getRequestsOf(user_id){
+    const query = `
+        SELECT relation_user1, relation_user2, user_id, user_name, user_registration, user_status, user_grade
+        FROM rs_relations FULL JOIN rs_users
+        ON relation_user1 = user_id
+        OR relation_user2 = user_id
+        WHERE (relation_user1 = ? OR relation_user2 = ?)
+        AND relation_status = "pending" 
+        AND user_id != ?`;
+
+    
+    return db.exec(query, [user_id, user_id, user_id]);
+}
 
 module.exports = {
     sendRequest,
     acceptRequest,
-    removeRelation
+    removeRelation,
+    getFriendsOf,
+    getRequestsOf
 }

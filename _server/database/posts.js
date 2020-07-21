@@ -71,19 +71,18 @@ async function voteExists(user, post) {
     else return data[0]
 }
 
-async function votePost(user, post, value) {
+async function addVote(user, post, value) {
 
     let vote_exists = await voteExists(user, post);
-    let query = "";
 
     if(!vote_exists) {
-        query = `
+        const query = `
             INSERT INTO rs_votes(vote_user, vote_post, vote_value)
             VALUES(?, ?, ?)`;
 
         return db.exec(query, [user, post, value]);
     } else {
-        query = `
+        const query = `
             UPDATE rs_votes
             SET vote_value = ?
             WHERE vote_user = ?
@@ -94,12 +93,21 @@ async function votePost(user, post, value) {
 }
 
 async function cancelVote(user, post) {
-    query = `
+    const query = `
     DELETE FROM rs_votes
     WHERE vote_user = ?
     AND vote_post = ?`;
 
     return db.exec(query, [user, post]);
+}
+
+async function getVotesOf(post_id) {
+    const query = `
+        select (select count(vote_value) from rs_votes where vote_value = 1 and vote_post = ?) -
+        (select count(vote_value) from rs_votes where vote_value = 0 and vote_post = ?) 
+        as value`;
+    
+    return db.exec(query, [post_id, post_id]);
 }
 
 async function getPostById(id) {
@@ -158,6 +166,7 @@ module.exports = {
     editPost,
     deletePost,
     searchPost,
-    cancelVote, // A tester
-    votePost    // A tester
+    cancelVote,
+    addVote,
+    getVotesOf
 }

@@ -1,11 +1,14 @@
 "use strict";
 
 const config = require("../config.js");
+
+const chalk = require("chalk");
 const mysql = require("mysql2");
 
 class DataBase {
 
     constructor({host, user, database, password}) {
+        
         this.pool = mysql.createPool({
             connectionLimit: 10,
             user,
@@ -19,7 +22,10 @@ class DataBase {
         // return an error and a data object
         return new Promise((resolve, reject)=>{
             this.pool.getConnection((error, connection)=>{
-                if(error) resolve({error: "Could not get a connection"});
+                if(error) {
+                    console.log(chalk.bgRedBright("Unable to get a connection"));
+                    resolve({error: "Could not get a connection"});
+                }
                 else {
                     connection.execute(query, params, (err, res, fld)=>{
                         if (err) resolve({error: err});
