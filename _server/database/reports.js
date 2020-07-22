@@ -1,40 +1,111 @@
+"use strict";
+
 const db = require("./DatabaseManager.js");
 
-async function reportPost(user, post, reason) {
-    const query = `
-        INSERT INTO rs_reports (report_user, report_post, report_reason)
-        VALUES(?, ?, ?)`;
+async function reportExists({user, post, comment}){
+    if(!user || (!post && !comment)) return null;
+
+    let query = "";
+    let params = [user];
+
+    if(comment) {
+        query = `
+            SELECT * FROM rs_reports
+            WHERE report_user = ?
+            AND report_comment = ?`;
+        params.push(comment);
+
+    } else if(post) {
+        query = `
+            SELECT * FROM rs_reports
+            WHERE report_user = ?
+            AND report_post = ?`;
+        params.push(post);
+
+    }
+
+    const {error, d} = await db.exec(query, params, true);
     
-    return db.exec(query, [user, post, reason]);
+    if(!error) return true;
+    else return false;
 }
 
-async function reportComment(user, comment, reason) {
-    const query = `
-        INSERT INTO rs_reports (report_user, report_comment, report_reason)
-        VALUES(?, ?, ?)`;
+async function report({user, post, comment, reason}) {
+    if(!user || (!post && !comment)) return null;
+    if(await reportExists({user, post, comment})) return null;
     
-    return db.exec(query, [user, comment, reason]);
+    if(!reason) reason = "";
+
+    let query = "";
+    let params = [];
+    
+    if(comment) {
+        query = `
+            INSERT INTO rs_reports (report_user, report_comment, report_reason)
+            VALUES(?, ?, ?)`;
+
+        params = [user, comment, reason];
+
+    } else if(post) {
+        query = `
+            INSERT INTO rs_reports (report_user, report_post, report_reason)
+            VALUES(?, ?, ?)`;
+
+        params = [user, post, reason];
+    }
+
+    return await db.exec(query, params);
 }
 
-async function getReportsOfComment(comment_id) {
-    const query = `
-        SELECT * FROM rs_reports
-        WHERE report_comment = ?`;
-    
-    return db.exec(query, [comment_id]);
+async function getReportsOf({user, comment, post}) {
+
+    let query = "SELECT * FROM rs_reports ";
+    let params = [];
+
+    if(user) {
+        query += "WHERE report_user = ?";
+        params = [user];
+
+    } else if(comment) {
+        query += "WHERE report_comment = ?";
+        params = [comment];
+
+    } else if(post) {
+        query += "WHERE report_post = ?";
+        params = [post];
+    }
+
+    console.log(query, params)
+
+    if(query)
+        return await db.exec(query, params);
+    else return null;
 }
 
-async function getReportsOfPost(post_id) {
-    const query = `
-        SELECT * FROM rs_reports
-        WHERE report_post = ?`;
-    
-    return db.exec(query, [post_id]);
+async function deleteReportsOf({comment, user, post}){
+    let query = "DELETE FROM rs_reports ";
+    let params = [];
+
+    if(user) {
+        query += "WHERE report_user = ?";
+        params = [user];
+
+    } else if(comment) {
+        query += "WHERE report_comment = ?";
+        params = [comment];
+
+    } else if(post) {
+        query += "WHERE report_post = ?";
+        params = [post];
+    }
+
+    if(query)
+        return await db.exec(query, params);
+    else return null;
 }
 
 module.exports = {
-    reportPost,
-    reportComment,       //A tester
-    getReportsOfComment, //A tester
-    getReportsOfPost
+    report,
+    getReportsOf,
+    deleteReportsOf
 }

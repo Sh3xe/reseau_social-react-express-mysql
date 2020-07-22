@@ -1,7 +1,8 @@
 "use strict";
+
 const db = require("./DatabaseManager");
 
-async function searchPost({search_query, category, start, step}) {
+async function search({search_query, category, start, step}) {
     // Giving default values for the params object
     if(!start || !step) {
         start = 0;
@@ -59,6 +60,55 @@ async function searchPost({search_query, category, start, step}) {
     }
 }
 
+async function getById(id) {
+    const query = `
+    SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, user_name, user_link
+    FROM rs_posts
+    INNER JOIN rs_users
+    ON rs_posts.post_user = rs_users.user_id
+    WHERE post_id = ?`;
+    
+    return await db.exec(query, [id], true);
+}
+
+async function getFromUser(id) {
+    const query = `
+    SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, user_name, user_link
+    FROM rs_posts
+    INNER JOIN rs_users
+    ON rs_posts.post_user = rs_users.user_id
+    WHERE user_id = ?`;
+    
+    return await db.exec(query, [id], true);
+}
+
+async function add(title, content, user_id) {
+    const query = `
+    INSERT INTO rs_posts(post_title, post_content, post_user)
+    VALUES(?, ?, ?)`;
+    
+    return await db.exec(query, [title, content, user_id]);
+}
+
+async function edit(title, content, post_id) {
+    const query = `
+    UPDATE rs_posts SET
+    post_title = ?,
+    post_content = ?,
+    post_edit_date = NOW()
+    WHERE post_id = ?`;
+    
+    return db.exec(query, [title, content, post_id]);
+}
+
+async function remove(post_id) {
+    const query = `
+    DELETE FROM rs_posts
+    WHERE post_id = ?`;
+    
+    return db.exec(query, [post_id, user_id]);
+}
+
 async function voteExists(user, post) {
     const query = `
         SELECT vote_value FROM rs_votes
@@ -110,62 +160,13 @@ async function getVotesOf(post_id) {
     return db.exec(query, [post_id, post_id]);
 }
 
-async function getPostById(id) {
-    const query = `
-        SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, user_name, user_link
-        FROM rs_posts
-        INNER JOIN rs_users
-        ON rs_posts.post_user = rs_users.user_id
-        WHERE post_id = ?`;
-
-    return await db.exec(query, [id], true);
-}
-
-async function getPostsOf(id) {
-    const query = `
-        SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, user_name, user_link
-        FROM rs_posts
-        INNER JOIN rs_users
-        ON rs_posts.post_user = rs_users.user_id
-        WHERE user_id = ?`;
-
-    return await db.exec(query, [id], true);
-}
-
-async function addPost(title, content, user_id) {
-    const query = `
-        INSERT INTO rs_posts(post_title, post_content, post_user)
-        VALUES(?, ?, ?)`;
-    
-    return await db.exec(query, [title, content, user_id]);
-}
-
-async function editPost(title, content, post_id) {
-    const query = `
-        UPDATE rs_posts SET
-        post_title = ?,
-        post_content = ?,
-        post_edit_date = NOW()
-        WHERE post_id = ?`;
-
-    return db.exec(query, [title, content, post_id]);
-}
-
-async function deletePost(post_id) {
-    const query = `
-        DELETE FROM rs_posts
-        WHERE post_id = ?`;
-    
-    return db.exec(query, [post_id, user_id]);
-}
-
 module.exports = {
-    getPostById,
-    getPostsOf,
-    addPost,
-    editPost,
-    deletePost,
-    searchPost,
+    getById,
+    getFromUser,
+    add,
+    edit,
+    remove,
+    search,
     cancelVote,
     addVote,
     getVotesOf

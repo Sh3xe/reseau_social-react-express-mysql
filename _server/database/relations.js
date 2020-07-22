@@ -1,4 +1,5 @@
 "use strict";
+
 const db = require("./DatabaseManager");
 
 async function relationExists(u1, u2, order_matter = false) {
@@ -39,7 +40,7 @@ async function acceptRequest(from, to) {
     return db.exec(query, [from, to]);
 }
 
-async function removeRelation(from, to) {
+async function remove(from, to) {
     const query = `
         DELETE FROM rs_relations
         WHERE relation_user1 = ? AND relation_user2 = ?
@@ -62,7 +63,6 @@ async function getFriendsOf(user_id) {
     return db.exec(query, [user_id, user_id, user_id]);
 }
 
-
 async function getRequestsOf(user_id){
     const query = `
         SELECT relation_user1, relation_user2, user_id, user_name, user_registration, user_status, user_grade
@@ -72,7 +72,6 @@ async function getRequestsOf(user_id){
         WHERE (relation_user1 = ? OR relation_user2 = ?)
         AND relation_status = "pending" 
         AND user_id != ?`;
-
     
     return db.exec(query, [user_id, user_id, user_id]);
 }
@@ -80,7 +79,7 @@ async function getRequestsOf(user_id){
 module.exports = {
     sendRequest,
     acceptRequest,
-    removeRelation,
+    remove,
     getFriendsOf,
     getRequestsOf
 }
