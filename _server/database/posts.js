@@ -2,14 +2,14 @@
 
 const db = require("./DatabaseManager");
 
-async function search({search_query, category, start, step}) {
+async function search({search, category, start, step}) {
     // Giving default values for the params object
     if(!start || !step) {
         start = 0;
         step = 15;
     }
 
-    if(search_query || category) {
+    if(search || category) {
 
         let params_array = [];
         
@@ -22,8 +22,8 @@ async function search({search_query, category, start, step}) {
             params_array.push(category);
         }
 
-        if(search_query) {
-            keywords = search_query.split(/\s|;|:|,/g);
+        if(search) {
+            keywords = search.split(/\s|;|:|,/g);
             search_command = "";
 
             //[a, b] => "post_title like a OR post_title like b"
@@ -62,23 +62,9 @@ async function search({search_query, category, start, step}) {
 
 async function getById(id) {
     const query = `
-    SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, user_name, user_link
-    FROM rs_posts
-    INNER JOIN rs_users
-    ON rs_posts.post_user = rs_users.user_id
+    SELECT * FROM rs_posts
     WHERE post_id = ?`;
-    
-    return await db.exec(query, [id], true);
-}
 
-async function getFromUser(id) {
-    const query = `
-    SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, user_name, user_link
-    FROM rs_posts
-    INNER JOIN rs_users
-    ON rs_posts.post_user = rs_users.user_id
-    WHERE user_id = ?`;
-    
     return await db.exec(query, [id], true);
 }
 
@@ -151,7 +137,7 @@ async function cancelVote(user, post) {
     return db.exec(query, [user, post]);
 }
 
-async function getVotesOf(post_id) {
+async function getVotes(post_id) {
     const query = `
         select (select count(vote_value) from rs_votes where vote_value = 1 and vote_post = ?) -
         (select count(vote_value) from rs_votes where vote_value = 0 and vote_post = ?) 
@@ -160,14 +146,23 @@ async function getVotesOf(post_id) {
     return db.exec(query, [post_id, post_id]);
 }
 
+async function getComments(post_id) {
+    const query = `
+    SELECT * FROM rs_comments
+    WHERE comment_post = ?`;
+
+    return db.exec(query, [post_id]);
+}
+
+
 module.exports = {
     getById,
-    getFromUser,
     add,
     edit,
     remove,
     search,
     cancelVote,
     addVote,
-    getVotesOf
+    getVotes,
+    getComments
 }

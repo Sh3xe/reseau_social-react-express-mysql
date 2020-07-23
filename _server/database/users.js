@@ -122,11 +122,61 @@ async function remove(user_id) {
     return await db.exec(query, [user_id]);
 }
 
+async function getComments(user_id) {
+    const query = `
+        SELECT * FROM rs_comments
+        WHERE comment_user = ?`;
+    
+    return db.exec(query, [user_id]);
+}
+
+async function getPosts(id) {
+    const query = `
+    SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, user_name, user_link
+    FROM rs_posts
+    INNER JOIN rs_users
+    ON rs_posts.post_user = rs_users.user_id
+    WHERE user_id = ?`;
+    
+    return await db.exec(query, [id], true);
+}
+
+async function getFriends(user_id) {
+    const query = `
+        SELECT relation_user1, relation_user2, user_id, user_name, user_registration, user_status, user_grade
+        FROM rs_relations FULL JOIN rs_users
+        ON relation_user1 = user_id
+        OR relation_user2 = user_id
+        WHERE (relation_user1 = ? OR relation_user2 = ?)
+        AND relation_status = "friends" 
+        AND user_id != ?`;
+
+    
+    return db.exec(query, [user_id, user_id, user_id]);
+}
+
+async function getRequests(user_id){
+    const query = `
+        SELECT relation_user1, relation_user2, user_id, user_name, user_registration, user_status, user_grade
+        FROM rs_relations FULL JOIN rs_users
+        ON relation_user1 = user_id
+        OR relation_user2 = user_id
+        WHERE (relation_user1 = ? OR relation_user2 = ?)
+        AND relation_status = "pending" 
+        AND user_id != ?`;
+    
+    return db.exec(query, [user_id, user_id, user_id]);
+}
+
 module.exports = {
     getById,
     authenticate,
     updateToken,
     add,
     update,
-    remove
+    remove,
+    getComments,
+    getPosts,
+    getFriends,
+    getRequests
 }

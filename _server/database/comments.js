@@ -27,26 +27,8 @@ async function edit(comment_id, content) {
     return db.exec(query, [content, comment_id]);
 }
 
-async function getFromUser(user_id) {
-    const query = `
-        SELECT * FROM rs_comments
-        WHERE comment_user = ?`;
-    
-    return db.exec(query, [user_id]);
-}
-
-async function getFromPost(post_id) {
-    const query = `
-    SELECT * FROM rs_comments
-    WHERE comment_post = ?`;
-
-    return db.exec(query, [post_id]);
-}
-
 module.exports = {
     add,
     remove,
-    edit,
-    getFromPost,
-    getFromUser
+    edit
 }

@@ -49,37 +49,8 @@ async function remove(from, to) {
     return db.exec(query, [from, to, from, to]);
 }
 
-async function getFriendsOf(user_id) {
-    const query = `
-        SELECT relation_user1, relation_user2, user_id, user_name, user_registration, user_status, user_grade
-        FROM rs_relations FULL JOIN rs_users
-        ON relation_user1 = user_id
-        OR relation_user2 = user_id
-        WHERE (relation_user1 = ? OR relation_user2 = ?)
-        AND relation_status = "friends" 
-        AND user_id != ?`;
-
-    
-    return db.exec(query, [user_id, user_id, user_id]);
-}
-
-async function getRequestsOf(user_id){
-    const query = `
-        SELECT relation_user1, relation_user2, user_id, user_name, user_registration, user_status, user_grade
-        FROM rs_relations FULL JOIN rs_users
-        ON relation_user1 = user_id
-        OR relation_user2 = user_id
-        WHERE (relation_user1 = ? OR relation_user2 = ?)
-        AND relation_status = "pending" 
-        AND user_id != ?`;
-    
-    return db.exec(query, [user_id, user_id, user_id]);
-}
-
 module.exports = {
     sendRequest,
     acceptRequest,
-    remove,
-    getFriendsOf,
-    getRequestsOf
+    remove
 }
