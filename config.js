@@ -3,5 +3,7 @@ module.exports = {
     database: "reseau_social",
     host: "localhost",
     user: "rsdb",
-    port: 8080
+    port: 8080,
+    saltRounds: 14,
+    secret_key: "q1+s15d098qsd154q1s03d210qs514za"
 }

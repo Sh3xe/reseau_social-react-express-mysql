@@ -1,19 +1,17 @@
 import React from 'react';
-import {BrowserRouter as Router, Route} from "react-router-dom";
 
-import Navigation from "./Navigation";
-import Home from "./Home";
-import Post from "./Post";
+import {BrowserRouter as Router} from "react-router-dom";
 
-import "../public/style.css";
+import SiteRouter from "./SiteRouter.js";
+import Navigation from "./components/Navigation";
+
+import "./style.css";
 
 function App() {
     return (
         <Router>
             <Navigation />
-
-            <Route path="/" exact component={Home}/>
-            <Route path="/post" component={Post}/>
+            <SiteRouter />
         </Router>
     );
 }

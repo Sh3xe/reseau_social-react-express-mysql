@@ -1,5 +1,8 @@
-dev_files
-node_modules
-_server/public/uploads/*
+_server/uploads/*
 _server/database/test.js
 _server/client/node_modules
+_server/client/build/*
+dev_files/css
+dev_files/db.txt
+dev_files/routes_name
+node_modules

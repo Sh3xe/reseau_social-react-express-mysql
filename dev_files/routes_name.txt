@@ -1,0 +1,27 @@
+1: POSTS
+
+/api/post/{id}
+/api/posts?key=value
+/api/post/{id}/comments?key=value
+
+/api/files
+
+/api/ = api principale, seulement la même origine
+/public-api/ = api pr arthur, requière un token, n'importe quel origine.
+
+/api/:
+	/post/{id}
+	/post/{id}/vote?value=(0|1)
+	/post/{id}/comments?start=0&step=16
+    /?search=query&category=name&start=number&step=number
+        (/?se=post&ca=sport&st=0&sp=15)
+    /comment
+    /user/{id}
+    /user/{id}/posts?start=0&step=16
+    /user/{id}/comments?start=0&step=16
+    /register
+    /login
+    /dashboard
+    /upload
+    /friends
+    /chat?

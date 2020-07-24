@@ -6,6 +6,19 @@ const bcrypt = require("bcryptjs");
 const {generateToken} = require("../utils.js");
 const config = require("../../config.js");
 
+async function getByToken(user_token) {
+    const query = `
+        SELECT 
+            user_name, user_email,
+            user_bio, user_token,
+            user_status, user_registration
+        FROM rs_users
+        WHERE user_token = ?`;
+
+    const {data, error} = await db.exec(query, [user_token]);
+    return error ? error : {data: data[0]};
+}
+
 async function getById(user_id) {
     const query = `
         SELECT 
@@ -16,9 +29,7 @@ async function getById(user_id) {
         WHERE user_id = ?`;
 
     const {data, error} = await db.exec(query, [user_id]);
-
-    if(!error) return { data: data[0] }
-    else return {error};
+    return error ? error : {data: data[0]};
 }
 
 async function authenticate(email, password) {
@@ -169,6 +180,7 @@ async function getRequests(user_id){
 }
 
 module.exports = {
+    getByToken,
     getById,
     authenticate,
     updateToken,
