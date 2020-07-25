@@ -1,4 +1,16 @@
 
+
+function getJsonFromResponse(data) {
+    try {
+        data.json()
+            .then(obj => {
+                return obj
+            })
+    } catch(e) {
+        return data;
+    }
+}
+
 export function sendBody(url, body) {
 
     const params = {
@@ -11,18 +23,15 @@ export function sendBody(url, body) {
         fetch(url, params)
             .then(data => {
                 if(!data.ok) {
-                    try {
-                        data.json().then(e =>{
-                            reject(e);
-                        });
-                    } catch(e) {
-                        reject(data);
-                    }
+                    reject(getJsonFromResponse(data));
                 }
-                else resolve(data);
+                else {
+                    resolve(getJsonFromResponse(data))
+                };
             }).catch(error => reject(error));
     });
 }
+
 
 export function validateForm(form, conditions) {
 
@@ -50,4 +59,35 @@ export function validateForm(form, conditions) {
     }
 
     return errors.length ? errors : false;
+}
+
+export function getUrlQuery(object) {
+    let key_values = [];
+    for(const [key, value] of Object.entries(object)) {
+        key_values.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
+    }
+
+    return key_values.join("&");
+}
+
+export function addZeros(value, length, filler = "0") {
+    try {
+        let str = value.toString();
+        while(str.length < length) {
+            str = `${filler}${str}`;
+        }
+        return str;
+    } catch(e) { return null }
+}
+
+export function formatDate(d) {
+	const {day, month, year, hours, minutes} = {
+		day: addZeros(d.getDate(), 2),
+		month: addZeros(d.getMonth() + 1, 2),
+		year: d.getFullYear(),
+		hours: addZeros(d.getHours(), 2),
+		minutes: addZeros(d.getMinutes(), 2),
+	}
+	
+	return `${day}/${month}/${year}, ${hours}h${minutes}`;
 }

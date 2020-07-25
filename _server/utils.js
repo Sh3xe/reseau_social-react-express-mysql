@@ -27,7 +27,7 @@ function addZeros(value, length, filler = "0") {
     } catch(e) { return null }
 }
 
-function generateToken(length = 255) {
+function generateToken(length = 64) {
 	const set = "0123456789azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN"
     let token = "";
     for(let i = 0; i < length; i++) {
@@ -39,7 +39,7 @@ function generateToken(length = 255) {
 function formatDate(d) {
 	const {day, month, year, hours, minutes} = {
 		day: addZeros(d.getDate(), 2),
-		month: addZeros(d.getMonth() + 1(), 2),
+		month: addZeros(d.getMonth() + 1, 2),
 		year: d.getFullYear(),
 		hours: addZeros(d.getHours(), 2),
 		minutes: addZeros(d.getMinutes(), 2),

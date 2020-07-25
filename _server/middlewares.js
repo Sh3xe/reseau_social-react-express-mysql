@@ -8,26 +8,15 @@ function logRequests(req, res, next) {
     next();
 }
 
-/*
-if(req.session.user){
-    const {error, data} = await users.getById(req.session.user.user_id);
-    if(!error) {
-        console.log(data)
-        req.user = data;
-        next();
-    }
-}
-next();
-*/
-
-
 async function authenticate(req, res, next) {
     /*
     try {
-        if(req.session.user) 
-        const {error, data} = await users.getByToken(req.session.user_token);
+        let error
+        if(req.session.user) {
+            const {error, data} = await users.getByToken(req.session.user_token);
+        }
         if(!error) {
-            req.session.user = data;
+            req.user = data;
         }
     } catch(e) {}*/
 }

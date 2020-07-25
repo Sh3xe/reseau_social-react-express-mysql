@@ -54,7 +54,7 @@ async function authenticate(email, password) {
 }
 
 async function updateToken(user_id) {
-    const new_token = generateToken(255);
+    const new_token = generateToken();
 
     const query = `
         UPDATE rs_users

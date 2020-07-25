@@ -8,7 +8,6 @@ const posts = require("../database/posts.js");
 router.get("/post/:id", async(req, res) => {
 
     if(!isNaN(req.params.id)) {
-
         const {error, data} = await posts.getById(req.params.id);
 
         if(!error) {
@@ -16,20 +15,19 @@ router.get("/post/:id", async(req, res) => {
 
         } else {
             if(error === "no result") res.writeHead(404);
-            else rs.writeHead(500);
+            else rs.status(500);
             res.end();
         }
     }
 });
 
 router.get("/posts", async(req, res) => {
-
     const {error, data} = await posts.search(req.query);
 
     if(!error) {
         res.json(data);
     } else {
-        res.writeHead(500);
+        res.status(500);
         res.end();
     }
 });

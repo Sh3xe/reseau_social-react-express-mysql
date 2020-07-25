@@ -17,13 +17,18 @@ async function search({search, category, start, step}) {
         let search_command = null;
         let category_command = null;
         
-        if(category) {
+        if(category && category.length) {
             category_command = "post_category = ?";
             params_array.push(category);
         }
 
-        if(search) {
+        if(search && search.length) {
             keywords = search.split(/\s|;|:|,/g);
+
+            keywords = keywords.filter(e => {
+                return (e !== "");
+            });
+
             search_command = "";
 
             //[a, b] => "post_title like a OR post_title like b"
@@ -41,10 +46,12 @@ async function search({search, category, start, step}) {
             we add an "AND" between them if there is both
         */
         let query = `
-            SELECT * FROM rs_posts
+            SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, post_category, user_name
+            FROM rs_posts FULL JOIN rs_users
+            ON user_id = post_user
             WHERE ${category_command || ""}
             ${ (category_command && search_command) ? "AND" : "" }
-            (${search_command || ""})
+            ${ search_command ? `(${search_command})` : "" }
             LIMIT ?, ?`;
 
         //We add the start / step at the end
@@ -62,7 +69,9 @@ async function search({search, category, start, step}) {
 
 async function getById(id) {
     const query = `
-    SELECT * FROM rs_posts
+    SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, post_category, user_name
+    FROM rs_posts FULL JOIN rs_users
+    ON user_id = post_user
     WHERE post_id = ?`;
 
     return await db.exec(query, [id], true);

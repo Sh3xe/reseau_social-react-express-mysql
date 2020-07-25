@@ -18,6 +18,7 @@ hr{
     height: 2px;
     border: 0;
     background-color: grey;
+    margin: 1em 0;
 }
 
 textarea{
@@ -233,6 +234,7 @@ ul.dropdown-content a{
 
 .container-content{
     margin-left: 1em;
+    width: 100%;
 }
 
 .container-aside{
@@ -271,8 +273,10 @@ ul.dropdown-content a{
 .post{
     background-color: white;    
     border: solid 1px grey;
+    height:100px;
     border-radius: 3px;
     margin-bottom: 1em;
+    height: auto;
 }
 
 .post-header{
@@ -283,8 +287,8 @@ ul.dropdown-content a{
 }
 
 .post-header img{
-    width: 50px;
-    height: 50px;
+    width: 30px;
+    height: 30px;
 }
 
 .post-infos{
@@ -308,6 +312,13 @@ ul.dropdown-content a{
     width: 100%;
 }
 
+.posts-feed {
+    margin: 1em 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 1em;
+}
+
 /*PREVIEW*/
 .post-preview img{
     max-height: 300px;
@@ -319,6 +330,11 @@ ul.dropdown-content a{
 .post-preview{
     display: flex;
     margin: 10px;
+}
+
+.post-preview-content {
+    text-decoration: none;
+    font-size: 1.2em;
 }
 
 /*SEARCH BAR*/
@@ -412,6 +428,56 @@ ul.dropdown-content a{
     transition: .3s;
 }
 
+/*POST*/
+.post-buttons button{
+    width: 100%;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.comment-form{
+    margin: 1em 0;
+    width: 100%;
+}
+
+.comment-form *{
+    display: block;
+    width: 100%;
+    margin: 1em 0;
+    margin-right: auto;
+}
+
+.comment-form button {
+    width: auto;
+}
+
+.comment{
+    background-color: white;
+    border: 1px solid grey;
+    border-radius: 3px;
+    margin-bottom: 1em;
+}
+
+.comment-header{
+    padding: 10px;
+    border-bottom: solid 1px grey;
+    background-color: rgba(0, 0, 0, 0.144);
+}
+
+.comment-content{
+    padding: 10px;
+}
+
+.page-controller button{
+    width: 180px;
+    margin: 0 1em;
+}
+
+.page-controller{
+    display: flex;
+    justify-content: space-between;
+}
+
 /*Erreur*/
 .error *{
 	display: block;
@@ -432,6 +498,15 @@ ul.dropdown-content a{
 
 /*MEDIA QUERYS*/
 @media only screen and (max-width: 1100px){
+    .post {
+        max-width: 100%;
+        width: 100%;
+        height: auto;
+    }
+    .posts-feed {
+        grid-template-columns: 100%;
+    }
+
     .header-container{
         width: 100%;
     }
