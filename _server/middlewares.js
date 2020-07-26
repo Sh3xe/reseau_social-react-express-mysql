@@ -8,20 +8,20 @@ function logRequests(req, res, next) {
     next();
 }
 
-async function authenticate(req, res, next) {
-    /*
+async function authenticateUser(req, res, next) {
     try {
-        let error
         if(req.session.user) {
             const {error, data} = await users.getByToken(req.session.user_token);
+            if(!error) {
+                req.user = data;
+            } else console.log(error)
         }
-        if(!error) {
-            req.user = data;
-        }
-    } catch(e) {}*/
+    } catch(e) {}
+
+    next();
 }
 
 module.exports = {
     logRequests,
-    authenticate
+    authenticateUser
 }

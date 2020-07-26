@@ -67,23 +67,30 @@ router.post("/login", async(req, res) => {
 		res.json({errors});
 		return;
 	}
-
+	
 	//authenticate
 	const {data, error} = await users.authenticate(email, password);
-
+	
 	if(error) {
 		res.status(400);
 		res.json({errors: ["Mauvaise e-mail ou mot de passe"]});
 		return;
 	}
-
+	
 	//Update user token and put inside session
 	await users.updateToken(data.user_id);
 
-	req.session.user_token = data.user_token;
-	req.session.user = data;
+	const updated_user =  await users.getById(data.user_id);
 
-	res.json(data);
+	req.session.user = updated_user.data;
+	req.session.user_token = req.session.user.user_token;
+
+	res.json(updated_user.data);
+});
+
+router.get("/logout", (req, res) => {
+	res.clearCookie("session");
+	res.redirect("login");
 });
 
 module.exports = router;

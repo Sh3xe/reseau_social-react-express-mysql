@@ -1,16 +1,3 @@
-
-
-function getJsonFromResponse(data) {
-    try {
-        data.json()
-            .then(obj => {
-                return obj
-            })
-    } catch(e) {
-        return data;
-    }
-}
-
 export function sendBody(url, body) {
 
     const params = {
@@ -23,10 +10,10 @@ export function sendBody(url, body) {
         fetch(url, params)
             .then(data => {
                 if(!data.ok) {
-                    reject(getJsonFromResponse(data));
+                    reject(data);
                 }
                 else {
-                    resolve(getJsonFromResponse(data))
+                    resolve(data);
                 };
             }).catch(error => reject(error));
     });

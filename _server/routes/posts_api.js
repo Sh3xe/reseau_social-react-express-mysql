@@ -3,6 +3,8 @@
 const express = require("express");
 const router = express.Router();
 
+const loginRequired = require("./loginRequired.js");
+
 const posts = require("../database/posts.js");
 
 router.get("/post/:id", async(req, res) => {
@@ -30,6 +32,10 @@ router.get("/posts", async(req, res) => {
         res.status(500);
         res.end();
     }
+});
+
+router.post("/upload", loginRequired, async(req, res) => {
+	//multer stuff
 });
 
 module.exports = router;

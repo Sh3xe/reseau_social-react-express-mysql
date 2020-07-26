@@ -33,6 +33,7 @@ async function getById(user_id) {
 }
 
 async function authenticate(email, password) {
+
     const query = `
         SELECT * FROM rs_users
         WHERE user_email = ?`;

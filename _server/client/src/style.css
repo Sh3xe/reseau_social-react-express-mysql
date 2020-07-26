@@ -428,6 +428,65 @@ ul.dropdown-content a{
     transition: .3s;
 }
 
+.login-head {
+    background-color: rgba(0, 0, 0, 0.144);
+    font-size: 1.1em;
+    text-align: center;
+    border: 1px solid grey;
+    border-radius: 4px 4px 0 0;
+}
+
+.login-container {
+    width: 500px;
+    margin: 0 auto;
+}
+
+.login-form {
+    background-color: white;
+    border-left: 1px solid grey;
+    border-right: 1px solid grey;
+    border-bottom: 1px solid grey;
+    border-radius: 0 0 4px 4px;
+}
+
+.login-head,
+.login-form {
+    padding: 10px;
+}
+
+.login-form input{
+    width: 100%;
+    display: block;
+    margin-bottom: 10px;
+}
+
+button.toggle-password{
+    display: inline;
+    border-radius: 4px;
+    background-color: rgb(196, 196, 196);
+    border: 0;
+    color: white;
+    cursor: pointer;
+}
+
+.log-message.red{
+    border: 1px rgb(255, 91, 91) solid;
+    border-radius: 4px;
+    background: rgb(255, 195, 195);
+    color: white;
+    margin: 1em 0;
+    padding: 1em;
+}
+
+.log-message.green{
+    border: 1px rgb(110, 255, 91) solid;
+    border-radius: 4px;
+    background: rgb(205, 255, 195);
+    color: white;
+    margin: 1em 0;
+    padding: 1em;
+}
+
 /*POST*/
 .post-buttons button{
     width: 100%;

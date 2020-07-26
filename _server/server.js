@@ -16,7 +16,7 @@ const io = socketio(server);
 
 app.use(sessions({ // cookie init
     cookieName: "session",
-    sameSite: "strict",
+    sameSite: "Strict",
     secret: config.secret_key,
     duration: 10 * 60 * 1000,
     ephemeral: true
@@ -28,11 +28,12 @@ const custom_middlewares = require("./middlewares.js");
 app.use(express.static(path.join( __dirname, "/client/build" )));
 app.use(custom_middlewares.logRequests);
 app.use(express.json());
-//app.use(custom_middlewares.authenticate);
+app.use(custom_middlewares.authenticateUser);
 
 // Routes
-app.use("/api", require("./routes/posts.js") );
-app.use("/api", require("./routes/authentication.js") );
+app.use("/api", require("./routes/posts_api.js") );
+app.use("/api", require("./routes/authentication_api.js") );
+app.use("/api", require("./routes/users_api.js") );
 
 // React App
 app.use((req, res, next) => {

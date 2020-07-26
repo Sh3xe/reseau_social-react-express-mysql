@@ -1,6 +1,8 @@
 import React from "react";
 
 import {validateForm, sendBody} from "../utils.js";
+import {UserContext} from "../App.js";
+import Cookies from "js-cookie";
 
 export default function Login() {
 
@@ -10,6 +12,8 @@ export default function Login() {
         password_visible: false,
         messages: ""
     };
+
+    const {setUser} = React.useContext(UserContext);
 
     const [state, setState] = React.useState(start_state);
 
@@ -35,11 +39,14 @@ export default function Login() {
         }
 
         sendBody("api/login", form_data)
-            .then((e) => {
-                e.json().then(e => setState({
-                    ...start_state,
-                    messages: JSON.stringify(e)
-                }))
+            .then( res => res.json())
+            .then( user => {
+                setUser(user);
+                setState({
+                    ...state,
+                    messages: JSON.stringify(user)
+                });
+                Cookies.set("user", true)
             })
             .catch(e => {
                 setState({
@@ -70,26 +77,30 @@ export default function Login() {
     }
 
     return (
-        <div>
-            <h1>S'identifier</h1>
-            <div>{state.messages}</div>
+        <div className="login-container">
+            { state.messages ? <div className="log-message red">
+                {state.messages}
+            </div> : ""} 
+            <header className="login-head">S'identifier </header>
             <form className="login-form">
                 <div>
                     <label htmlFor="email"> E-mail </label>
-                    <input 
-                        type="email" name="email"
-                        value={state.email} onChange={handleInputChange}
-                    ></input>
                 </div>
+                <input className="input t1"
+                    type="email" name="email"
+                    value={state.email} onChange={handleInputChange}
+                ></input>
                 <div>
-                    <label htmlFor="password"> Mot de passe </label>
-                    <input 
-                        type={state.password_visible ? "text" : "password"} name="password" required
-                        value={state.password} onChange={handleInputChange}
-                    ></input>
-                    <button onClick={togglePasswordVisibility}>{state.password_visible ? "Hide" : "Show"}</button>
+                <label htmlFor="password"> Mot de passe </label>
+                <button onClick={togglePasswordVisibility} className="toggle-password"> 
+                    {state.password_visible ? "Hide" : "Show"}
+                </button>
                 </div>
-                <button onClick={handleSubmit}> S'identifier</button>
+                <input className="input t1"
+                    type={state.password_visible ? "text" : "password"} name="password" required
+                    value={state.password} onChange={handleInputChange}
+                ></input>
+                <button onClick={handleSubmit} className="button col1"> S'identifier</button>
             </form>
         </div>
     );

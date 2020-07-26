@@ -1,18 +1,44 @@
 import React from 'react';
 
 import {BrowserRouter as Router} from "react-router-dom";
+import Cookies from "js-cookie";
 
-import SiteRouter from "./SiteRouter.js";
-import Navigation from "./components/Navigation";
+import SiteRouter from "./Routes.js";
+import Navigation from "./components/Navigation.js";
 
 import "./style.css";
 
+export const UserContext = React.createContext({
+    user: {},
+    setUser: () => {}
+});
+
 function App() {
+
+    const [user, setUser] = React.useState(null);
+
+    React.useEffect(() => {
+        if(Cookies.get("user")) {
+            fetch("api/current_user")
+                .then(res => res.json())
+                .then(user => setUser(user))
+        }
+    }, []);
+
+    const value = React.useMemo(() => {
+        return {
+            user,
+            setUser
+        }
+    }, [user, setUser]);
+
     return (
-        <Router>
-            <Navigation />
-            <SiteRouter />
-        </Router>
+        <UserContext.Provider value={value}>
+            <Router>
+                {user ? <Navigation /> : ""}
+                <SiteRouter />
+            </Router>
+        </UserContext.Provider>
     );
 }
 
