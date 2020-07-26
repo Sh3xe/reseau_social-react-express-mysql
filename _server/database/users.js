@@ -11,7 +11,8 @@ async function getByToken(user_token) {
         SELECT 
             user_name, user_email,
             user_bio, user_token,
-            user_status, user_registration
+            user_status, user_registration,
+            user_id
         FROM rs_users
         WHERE user_token = ?`;
 
@@ -24,7 +25,8 @@ async function getById(user_id) {
         SELECT 
             user_name, user_email,
             user_bio, user_token,
-            user_status, user_registration
+            user_status, user_registration,
+            user_id
         FROM rs_users
         WHERE user_id = ?`;
 
@@ -155,14 +157,13 @@ async function getPosts(id) {
 
 async function getFriends(user_id) {
     const query = `
-        SELECT relation_user1, relation_user2, user_id, user_name, user_registration, user_status, user_grade
+        SELECT relation_user1, relation_user2, user_id, user_name, user_registration, user_status
         FROM rs_relations FULL JOIN rs_users
         ON relation_user1 = user_id
         OR relation_user2 = user_id
         WHERE (relation_user1 = ? OR relation_user2 = ?)
         AND relation_status = "friends" 
         AND user_id != ?`;
-
     
     return db.exec(query, [user_id, user_id, user_id]);
 }

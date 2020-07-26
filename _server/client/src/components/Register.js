@@ -1,6 +1,6 @@
 import React from "react";
 
-import {validateForm, sendBody} from "../utils.js";
+import {validateForm, sendForm} from "../utils.js";
 
 export default function Register() {
 
@@ -18,7 +18,7 @@ export default function Register() {
     const handleSubmit = function(e) {
         e.preventDefault();
         
-        const form_data = {
+        let form_data = {
             name: state.username,
             password: state.password,
             email: state.email,
@@ -40,20 +40,19 @@ export default function Register() {
             return;
         }
 
-        sendBody("api/register", form_data)
-            .then(() => {
+        sendForm("api/register", "POST", JSON.stringify(form_data), (err, res) => {
+            if(!err) {
                 setState({
                     ...start_state,
                     messages: ["Vous vous êtes enregistré(e)!"]
                 })
-            })
-            .catch(e => {
+            } else {
                 setState({
                     ...state,
-                    messages: JSON.stringify(e)
+                    messages: JSON.stringify(res)
                 });
-            });
-
+            }
+        })
     }
 
     const handleInputChange = function(e) {

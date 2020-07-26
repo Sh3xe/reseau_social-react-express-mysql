@@ -75,7 +75,8 @@ export default function Posts() {
         category: "Tout",
         search: "",
         start: 0,
-        step: 16
+        step: 16,
+        search_timeout: 0
     });
 
     const [posts, setPosts] = React.useState([]);
@@ -84,24 +85,32 @@ export default function Posts() {
     //Functions
     const handleSearchChange = function(e) {
         const value = e.target.value;
-        setState({...state, search: value});
+
+        if(state.search_timeout) {
+            clearTimeout(state.search_timeout);
+        }
+
+        setState({
+            ...state,
+            search: value,
+            search_timeout: setTimeout(() => {
+                searchPosts()
+            }, 5000)
+        });
     }
 
     const handleCategoryChange = function(new_category) {
         setState({...state, category: new_category});
     }
     
-    const searchPosts = React.useCallback(function(e) {
-        //We can call this function when we click on "search" or at the start
-        //so we don't alwase need to preventDefault
-        if(e) e.preventDefault(); 
+    const searchPosts = function() {
 
         const url_query = getUrlQuery({
             start: state.start,
             search: state.search,
             step: state.step,
             category: state.category
-        }); // returns a "?key=valueékey2=val2"
+        }); // returns a "?key1=value1&key2=val2"
 
         const url = "api/posts?" + url_query;
 
@@ -109,11 +118,23 @@ export default function Posts() {
             .then(res => res.json())
             .then(data => setPosts(data))
             .catch(error => setMessage(error));
-    }, [state]);
+    };
+
+    React.useEffect(searchPosts, [state.category]);
 
     React.useEffect(() => {
-        searchPosts();
-    }, [searchPosts])
+        if(state.search_timeout) {
+            clearTimeout(state.search_timeout);
+        }
+
+        setState( {
+            ...state,
+            search_timeout: setTimeout(() => {
+                searchPosts();
+            }, 500)
+        });
+
+    }, [state.search]);
 
     //Page
     return (

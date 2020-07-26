@@ -13,7 +13,7 @@ export const UserContext = React.createContext({
     setUser: () => {}
 });
 
-function App() {
+export default function App() {
 
     const [user, setUser] = React.useState(null);
 
@@ -41,5 +41,3 @@ function App() {
         </UserContext.Provider>
     );
 }
-
-export default App;

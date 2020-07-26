@@ -1,6 +1,6 @@
 import React from "react";
 
-import {validateForm, sendBody} from "../utils.js";
+import {validateForm, sendForm} from "../utils.js";
 import {UserContext} from "../App.js";
 import Cookies from "js-cookie";
 
@@ -19,11 +19,11 @@ export default function Login() {
 
     const handleSubmit = function(e) {
         e.preventDefault();
-        
+
         const form_data = {
             password: state.password,
             email: state.email
-        };
+        }
 
         const errors = validateForm(form_data, {
             password: {min:8, max:100},
@@ -38,22 +38,22 @@ export default function Login() {
             return null;
         }
 
-        sendBody("api/login", form_data)
-            .then( res => res.json())
-            .then( user => {
+        sendForm("api/login", "POST", JSON.stringify(form_data), (err, res) => {
+            if(!err) {
+                const user = JSON.parse(res);
                 setUser(user);
                 setState({
                     ...state,
                     messages: JSON.stringify(user)
                 });
-                Cookies.set("user", true)
-            })
-            .catch(e => {
+                Cookies.set("user", true);
+            } else {
                 setState({
                     ...state,
-                    messages: JSON.stringify(e)
+                    messages: "erreure"
                 });
-            });
+            }
+        });
     }
 
     const handleInputChange = function(e) {
@@ -77,7 +77,7 @@ export default function Login() {
     }
 
     return (
-        <div className="login-container">
+        <div className="form-container">
             { state.messages ? <div className="log-message red">
                 {state.messages}
             </div> : ""} 

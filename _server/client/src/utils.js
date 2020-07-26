@@ -19,6 +19,21 @@ export function sendBody(url, body) {
     });
 }
 
+export function sendForm(url, method, data, callback) {
+    const xhr = new XMLHttpRequest();
+
+    xhr.open(method, url);
+
+    xhr.setRequestHeader('Content-Type', 'application/json');
+
+    xhr.onload = function() {
+        if(xhr.status !== 200) {
+            callback(true, xhr.response);
+        } else callback(false, xhr.response);
+    };
+
+    xhr.send(data);
+}
 
 export function validateForm(form, conditions) {
 

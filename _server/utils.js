@@ -16,7 +16,7 @@ function objectToKeyValue(object) {
     }
     return query.slice(0, query.length - 1);
 }
-
+/*
 function addZeros(value, length, filler = "0") {
     try {
         let str = value.toString();
@@ -25,7 +25,7 @@ function addZeros(value, length, filler = "0") {
         }
         return str;
     } catch(e) { return null }
-}
+}*/
 
 function generateToken(length = 64) {
 	const set = "0123456789azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN"
@@ -35,7 +35,7 @@ function generateToken(length = 64) {
     }
     return token;
 }
-
+/*
 function formatDate(d) {
 	const {day, month, year, hours, minutes} = {
 		day: addZeros(d.getDate(), 2),
@@ -46,7 +46,7 @@ function formatDate(d) {
 	}
 	
 	return `${day}/${month}/${year}, ${hours}h${$minutes}`;
-}
+}*/
 
 function validateForm(form, conditions) {
 
@@ -79,8 +79,8 @@ function validateForm(form, conditions) {
 module.exports = {
 	parseKeyValueString,
 	objectToKeyValue,
-	addZeros,
+	//addZeros,
 	generateToken,
-    formatDate,
+    //formatDate,
     validateForm
 };

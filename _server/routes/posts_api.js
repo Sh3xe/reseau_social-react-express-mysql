@@ -1,11 +1,35 @@
 "use strict";
 
 const express = require("express");
+const multer = require("multer");
 const router = express.Router();
 
 const loginRequired = require("./loginRequired.js");
 
 const posts = require("../database/posts.js");
+
+//Multer init for files upload
+/*
+const storage = multer.diskStorage({
+    destination: `${__dirname}/../uploads`,
+    filename: function(req, file, callback) {
+        callback(null, `${Date.now()}-${file.originalname.length}`);
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits:{fileSize: 1000000},
+    fileFilter: function(req, file, callback) {
+        const extname = config.multer_allowed_files.test(file.originalname.toLocaleLowerCase());
+        const mimetype = config.multer_allowed_files.test(file.mimetype);
+        if(extname && mimetype) callback(null, true);
+        else{
+            callback("Erreur: le ficher doit faire 1mb MAX et être une image ou une vidéo");
+        }
+    }
+}).single("Image");
+*/
 
 router.get("/post/:id", async(req, res) => {
 
