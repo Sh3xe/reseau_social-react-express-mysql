@@ -19,12 +19,10 @@ export function sendBody(url, body) {
     });
 }
 
-export function sendForm(url, method, data, callback) {
+export function sendForm({url, method, type}, data, callback) {
     const xhr = new XMLHttpRequest();
 
     xhr.open(method, url);
-
-    xhr.setRequestHeader('Content-Type', 'application/json');
 
     xhr.onload = function() {
         if(xhr.status !== 200) {
@@ -32,7 +30,12 @@ export function sendForm(url, method, data, callback) {
         } else callback(false, xhr.response);
     };
 
-    xhr.send(data);
+    if(type === "json") {
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(JSON.stringify(data));
+    } else {
+        xhr.send(data);
+    }
 }
 
 export function validateForm(form, conditions) {
@@ -52,11 +55,11 @@ export function validateForm(form, conditions) {
         } else continue;
 
         if(min !== undefined && value.length < min) {
-            errors.push(`${key} doit être supérieur à ${min}`);
+            errors.push({content:`${key} doit être supérieur à ${min}`, col:"red"});
         }
 
         if(max !== undefined && value.length > max) {
-            errors.push(`${key} doit être inférieur à ${max}`);
+            errors.push({content:`${key} doit être inférieur à ${max}`, col:"red"});
         }
     }
 

@@ -24,12 +24,10 @@ export default function Upload() {
     const handleSubmit = function(e) {
         e.preventDefault();
 
-        let form_data = {
+        const errors = validateForm({
             title: state.title,
             content: state.content
-        };
-
-        const errors = validateForm(form_data, {
+        }, {
             title: {min: 1, max:255},
             content: {min:1, max:2000}
         });
@@ -38,23 +36,23 @@ export default function Upload() {
             return;
         }
 
-        console.log(file_input.current.files)
+        const form_data = new FormData();
 
-        let files = [];
-
+        form_data.append("title", state.title);
+        form_data.append("content", state.content);
+        
         for(let file of file_input.current.files) {
-            files.push(file.);
+            form_data.append("files[]", file);
         }
 
-/*
-        form_data = {
-            ...form_data,
-
+        const req_params = {
+            method: "POST",
+            url:"api/upload"
         }
-/*
-        sendForm("/upload", "POST", JSON.stringify(form_data), (res, err) => {
+
+        sendForm(req_params, form_data, (err, res) => {
             console.log(err, res);
-        });*/
+        });
     }
 
     return (

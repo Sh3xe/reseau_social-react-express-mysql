@@ -1,8 +1,27 @@
 import React from "react";
+import {Link} from "react-router-dom";
 
 import {validateForm, sendForm} from "../utils.js";
 import {UserContext} from "../App.js";
 import Cookies from "js-cookie";
+
+function Message({messages}) {
+    let messages_el = [];
+
+    for(let i = 0; i < messages.length; i++) {
+        const class_name = `log-message ${messages[i].col}`;
+        messages_el.push(
+        <div className={class_name} key={i}>
+            {messages[i].content}
+        </div>);
+    }
+
+    return (
+        <div>
+            {messages_el}
+        </div>
+    );
+}
 
 export default function Login() {
 
@@ -10,7 +29,7 @@ export default function Login() {
         password: "",
         email: "",
         password_visible: false,
-        messages: ""
+        messages: []
     };
 
     const {setUser} = React.useContext(UserContext);
@@ -19,7 +38,7 @@ export default function Login() {
 
     const handleSubmit = function(e) {
         e.preventDefault();
-
+        
         const form_data = {
             password: state.password,
             email: state.email
@@ -33,24 +52,31 @@ export default function Login() {
         if(errors.length) {
             setState({
                 ...state,
-                messages: JSON.stringify(errors)
+                messages: errors
             });
             return null;
         }
 
-        sendForm("api/login", "POST", JSON.stringify(form_data), (err, res) => {
+        const req_params = {
+            method: "POST",
+            url:"api/login",
+            type:"json"
+        }
+
+        sendForm(req_params, form_data, (err, res) => {
             if(!err) {
                 const user = JSON.parse(res);
+                Cookies.set("user", true);
                 setUser(user);
                 setState({
                     ...state,
-                    messages: JSON.stringify(user)
+                    messages: [{col:"green", content: `Identifié en tant que "${user.user_name}"`}]
                 });
-                Cookies.set("user", true);
             } else {
+                Cookies.set("user", false);
                 setState({
                     ...state,
-                    messages: "erreure"
+                    messages: [{col:"red", content: res}]
                 });
             }
         });
@@ -78,10 +104,8 @@ export default function Login() {
 
     return (
         <div className="form-container">
-            { state.messages ? <div className="log-message red">
-                {state.messages}
-            </div> : ""} 
-            <header className="login-head">S'identifier </header>
+            <Message messages={state.messages} />
+            <header className="login-head">S'identifier ou <Link to="/register">S'enregistrer </Link></header>
             <form className="login-form">
                 <div>
                     <label htmlFor="email"> E-mail </label>

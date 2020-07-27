@@ -2,6 +2,8 @@ import React from "react";
 
 import {validateForm, sendForm} from "../utils.js";
 
+import {Link} from "react-router-dom";
+
 export default function Register() {
 
     const start_state = {
@@ -18,7 +20,7 @@ export default function Register() {
     const handleSubmit = function(e) {
         e.preventDefault();
         
-        let form_data = {
+        const form_data = {
             name: state.username,
             password: state.password,
             email: state.email,
@@ -40,7 +42,13 @@ export default function Register() {
             return;
         }
 
-        sendForm("api/register", "POST", JSON.stringify(form_data), (err, res) => {
+        const req_params = {
+            url: "api/register",
+            method: "POST",
+            type: "json"
+        }
+
+        sendForm(req_params, form_data, (err, res) => {
             if(!err) {
                 setState({
                     ...start_state,
@@ -82,40 +90,42 @@ export default function Register() {
     }
 
     return (
-        <div>
-            <h1>S'enregistrer</h1>
+        <div className="form-container">
+            <header className="login-head">S'enregistrer ou <Link to="/login">S'identifier </Link></header>
             <div>{state.messages}</div>
             <form className="login-form">
                 <div>
                     <label htmlFor="key"> Clé d'enregistrement </label>
-                    <input 
+                </div>
+                    <input className="input t1"
                         type="text" name="key"
                         value={state.key} onChange={handleInputChange}
                     ></input>
-                </div>
                 <div>
                     <label htmlFor="username"> Nom d'utilisateur </label>
-                    <input 
+                </div>
+                    <input className="input t1"
                         type="text" name="username"
                         value={state.username} onChange={handleInputChange}
                     ></input>
-                </div>
                 <div>
                     <label htmlFor="email"> E-mail </label>
-                    <input 
+                </div>
+                    <input className="input t1"
                         type="email" name="email"
                         value={state.email} onChange={handleInputChange}
                     ></input>
-                </div>
                 <div>
                     <label htmlFor="password"> Mot de passe </label>
-                    <input 
+                    <button onClick={togglePasswordVisibility} className="toggle-password">
+                        {state.password_visible ? "Hide" : "Show"}
+                    </button>
+                </div>
+                    <input className="input t1"
                         type={state.password_visible ? "text" : "password"} name="password" required
                         value={state.password} onChange={handleInputChange}
                     ></input>
-                    <button onClick={togglePasswordVisibility}>{state.password_visible ? "Hide" : "Show"}</button>
-                </div>
-                <button onClick={handleSubmit}> S'enregistrer</button>
+                <button onClick={handleSubmit} className="button col1"> S'enregistrer</button>
             </form>
         </div>
     );

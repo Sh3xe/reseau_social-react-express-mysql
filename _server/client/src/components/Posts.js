@@ -49,34 +49,54 @@ function CategorySelector({category, changeCategory}) {
     );
 }
 
-function PostsContainer({posts}) {
-    let posts_el = [];
-    posts.forEach(post => {
-        posts_el.push(<Post key={posts_el.length} post={post} />);
-    });
+function PostsContainer({start, posts, onPageChange}) {
+    //Hooks
+    const [post_el, setPostEl] = React.useState([]);
+
+    //Functions
+    const pagePlus = function() {
+        if(posts.length > 14)
+            onPageChange(1);
+    }
+
+    const pageMinus = function() {
+        if(start >= 14) 
+            onPageChange(-1);
+    }
+
+    React.useEffect(() => {
+        let new_post_el = [];
+        posts.forEach(post => {
+            new_post_el.push(<Post key={new_post_el.length} post={post} />);
+        });
+        if(new_post_el.length === 15) new_post_el.pop();
+
+        setPostEl(new_post_el);
+    }, [posts]);
+
 
     return (
        <React.Fragment>
         <div className="posts-feed">
-            {posts_el}
+            {post_el}
         </div>
-        {posts.length >= 16 ?<div className="page-controller">
-            <button className="button norm">Page précédente</button>
-            <button className="button norm">Page suivante</button>
-        </div> : ""}
+        { posts.length > 14 || start >=14 ?
+            <div className="page-controller">
+                <button className="button norm" onClick={pageMinus}>Page précédente</button>
+                <button className="button norm" onClick={pagePlus}>Page suivante</button>
+            </div> : ""
+        }
         </React.Fragment>
     );
 }
 
 export default function Posts() {
-    
     //Hooks
     const [state, setState] = React.useState({
         category: "Tout",
         search: "",
         start: 0,
-        step: 16,
-        search_timeout: 0
+        step: 15
     });
 
     const [posts, setPosts] = React.useState([]);
@@ -86,25 +106,25 @@ export default function Posts() {
     const handleSearchChange = function(e) {
         const value = e.target.value;
 
-        if(state.search_timeout) {
-            clearTimeout(state.search_timeout);
-        }
-
         setState({
             ...state,
-            search: value,
-            search_timeout: setTimeout(() => {
-                searchPosts()
-            }, 5000)
+            search: value
         });
     }
 
     const handleCategoryChange = function(new_category) {
         setState({...state, category: new_category});
     }
+
+    const handlePageChange = function(value) {
+        if(value === -1) {
+            setState({ ...state, start: state.start - 14 });
+        } else if(value === 1) {
+            setState({ ...state, start: state.start + 14 });
+        }
+    }
     
     const searchPosts = function() {
-
         const url_query = getUrlQuery({
             start: state.start,
             search: state.search,
@@ -120,21 +140,7 @@ export default function Posts() {
             .catch(error => setMessage(error));
     };
 
-    React.useEffect(searchPosts, [state.category]);
-
-    React.useEffect(() => {
-        if(state.search_timeout) {
-            clearTimeout(state.search_timeout);
-        }
-
-        setState( {
-            ...state,
-            search_timeout: setTimeout(() => {
-                searchPosts();
-            }, 500)
-        });
-
-    }, [state.search]);
+    React.useEffect(searchPosts, [state]);
 
     //Page
     return (
@@ -152,7 +158,7 @@ export default function Posts() {
             <div>
                 {message}
             </div>
-            <PostsContainer posts={posts} />
+            <PostsContainer start={state.start} posts={posts} onPageChange={handlePageChange}/>
         </div>
         </React.Fragment>
     );

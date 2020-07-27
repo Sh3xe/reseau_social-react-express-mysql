@@ -9,13 +9,13 @@ import Navigation from "./components/Navigation.js";
 import "./style.css";
 
 export const UserContext = React.createContext({
-    user: {},
+    user: undefined,
     setUser: () => {}
 });
 
 export default function App() {
 
-    const [user, setUser] = React.useState(null);
+    const [user, setUser] = React.useState(undefined);
 
     React.useEffect(() => {
         if(Cookies.get("user")) {
@@ -36,7 +36,7 @@ export default function App() {
         <UserContext.Provider value={value}>
             <Router>
                 {user ? <Navigation /> : ""}
-                <SiteRouter />
+                {user !== undefined ? <SiteRouter /> : ""}
             </Router>
         </UserContext.Provider>
     );

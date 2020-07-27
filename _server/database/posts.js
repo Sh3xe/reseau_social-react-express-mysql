@@ -77,12 +77,18 @@ async function getById(id) {
     return await db.exec(query, [id], true);
 }
 
-async function add(title, content, user_id) {
+async function add(title, content, user_id, category) {
+
+    if(!category) category = "Tout";
+
     const query = `
-    INSERT INTO rs_posts(post_title, post_content, post_user)
-    VALUES(?, ?, ?)`;
-    
-    return await db.exec(query, [title, content, user_id]);
+    INSERT INTO rs_posts(post_title, post_content, post_user, post_category)
+    VALUES(?, ?, ?, ?)`;
+
+    const {error} =  await db.exec(query, [title, content, user_id, category]);
+
+    if(!error) return await db.exec("SELECT LAST_INSERT_ID()", []);
+    else return error;
 }
 
 async function edit(title, content, post_id) {

@@ -26,6 +26,7 @@ app.use(sessions({ // cookie init
 const custom_middlewares = require("./middlewares.js");
 
 app.use(express.static(path.join( __dirname, "/client/build" )));
+app.use(express.static(path.join( __dirname, "/uploads" )));
 app.use(custom_middlewares.logRequests);
 app.use(express.json());
 app.use(custom_middlewares.authenticateUser);

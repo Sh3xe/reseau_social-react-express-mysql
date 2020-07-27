@@ -50,7 +50,6 @@ router.post("/register", async(req, res) => {
 });
 
 router.post("/login", async(req, res) => {
-	console.log(req.body)
 	//get and validate form
 	const {email, password} = req.body;
 

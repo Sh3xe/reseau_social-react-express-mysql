@@ -480,10 +480,10 @@ button.toggle-password{
 }
 
 .log-message.green{
-    border: 1px rgb(110, 255, 91) solid;
+    border: 1px rgb(21, 191, 0) solid;
     border-radius: 4px;
-    background: rgb(205, 255, 195);
-    color: white;
+    background: rgb(184, 232, 175);
+    color: #66a461;
     margin: 1em 0;
     padding: 1em;
 }
