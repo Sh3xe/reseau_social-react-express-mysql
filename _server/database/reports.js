@@ -31,8 +31,8 @@ async function reportExists({user, post, comment}){
 }
 
 async function report({user, post, comment, reason}) {
-    if(!user || (!post && !comment)) return null;
-    if(await reportExists({user, post, comment})) return null;
+    if(!user || (!post && !comment)) return {error: true};
+    if(await reportExists({user, post, comment})) return {error: true};
     
     if(!reason) reason = "";
 

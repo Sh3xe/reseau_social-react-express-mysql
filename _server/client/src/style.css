@@ -309,7 +309,7 @@ ul.dropdown-content a{
     padding: 0.5em 1em;
 }
 
-.post-file img{
+.post-file{
     width: 100%;
 }
 
@@ -402,8 +402,48 @@ ul.dropdown-content a{
     color: rgb(93, 190, 255);
     transition: .5s;
 }
+/*confirmation-message*/
+
+.aside-confirmation {
+    padding: 10px;
+    background-color: white;
+    border-radius: 4px;
+    border: 1px solid grey;
+}
+
+.aside-confirmation button{
+    border: 1px solid grey;
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.aside-confirmation button:hover{
+    background-color: rgb(204, 204, 204);
+    transition: .3s;
+}
+
+.aside-confirmation textarea {
+    margin-bottom: 1em;
+    border-radius: 4px;
+    border: 1px solid grey;
+}
 
 /*Forms*/
+
+.confirmation-button {
+    border: 1px solid grey;
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 3px;
+    cursor: pointer;
+    margin-left: 1em;
+}
+
+.confirmation-button:hover {
+    background-color: rgb(204, 204, 204);
+    transition: .3s;
+}
+
 .input.t1{
     padding: 6px;
     background-color: white;
@@ -427,6 +467,14 @@ ul.dropdown-content a{
 .input.t2:focus{
     border-color: rgb(93, 190, 255);
     transition: .3s;
+}
+
+.select-input {
+    background-color: white;
+    border-radius: 4px;
+    border: 1px solid grey;
+    margin: 0 2em;
+    height: 30px;
 }
 
 .login-head {
@@ -493,6 +541,21 @@ button.toggle-password{
 }
 
 /*POST*/
+.carousel-content {
+    min-width: 100%;
+}
+
+.carousel {
+    width: 100%;
+    max-height: 400px;
+    overflow-y: scroll;
+}
+
+.carousel-controller {
+    display: flex;
+    justify-content: space-between;
+}
+
 .post-buttons button{
     width: 100%;
     display: block;

@@ -1,0 +1,10 @@
+SELECT post_id, file_name
+FROM rs_posts
+FULL JOIN rs_files ON post_id = file_post AND
+FULL JOIN rs_users ON post_user = user_id
+
+SELECT file_name, file_mime, post_id
+FROM rs_posts
+    INNER JOIN rs_files ON rs_files.file_post = rs_posts.post_id
+    INNER JOIN rs_users ON rs_users.user_id = rs_posts.post_user
+WHERE post_id = 1;

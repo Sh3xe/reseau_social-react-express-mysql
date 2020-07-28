@@ -30,6 +30,8 @@ export function sendForm({url, method, type}, data, callback) {
         } else callback(false, xhr.response);
     };
 
+    console.log(url, method, data)
+
     if(type === "json") {
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(JSON.stringify(data));

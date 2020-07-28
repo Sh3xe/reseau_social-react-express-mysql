@@ -19,18 +19,25 @@ class DataBase {
     }
 
     exec(query, params, res_required = false) {
+        //console.log(query, params);
         // return an error and a data object
         return new Promise((resolve, reject)=>{
             this.pool.getConnection((error, connection)=>{
                 if(error) {
                     console.log(chalk.bgRedBright("Unable to get a connection"));
                     resolve({error: "Could not get a connection"});
-                }
-                else {
+                } else {
                     connection.execute(query, params, (err, res, fld)=>{
                         if (err) resolve({error: err});
                         else if (!res.length && res_required) resolve({error: "no result"});
-                        else resolve({data: res});
+                        else {
+                            connection.execute("SELECT LAST_INSERT_ID()", [], (err, id, fld) => {
+                                if (err || !id.length) resolve({data:res});
+                                else {
+                                    resolve({data:res, last_id: id[0]["LAST_INSERT_ID()"]});
+                                }
+                            });
+                        }
                         connection.release();
                     });
                 }

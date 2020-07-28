@@ -12,7 +12,6 @@ async function search({search, category, start, step}) {
     if(search || category) {
 
         let params_array = [];
-        
         let keywords = null;
         let search_command = null;
         let category_command = null;
@@ -30,7 +29,6 @@ async function search({search, category, start, step}) {
             });
 
             search_command = "";
-
             //[a, b] => "post_title like a OR post_title like b"
             for(let i = 0; i < keywords.length; i++) {
                 if(i !== 0) search_command += " OR";
@@ -70,11 +68,19 @@ async function search({search, category, start, step}) {
 async function getById(id) {
     const query = `
     SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, post_category, user_name
-    FROM rs_posts FULL JOIN rs_users
-    ON user_id = post_user
+    FROM rs_posts FULL JOIN rs_users ON post_user = user_id
     WHERE post_id = ?`;
 
     return await db.exec(query, [id], true);
+}
+
+async function getFiles(post_id) {
+    const query = `
+    SELECT file_name, file_mime
+    FROM rs_posts FULL JOIN rs_files ON file_post = post_id
+    WHERE post_id = ?`;
+
+    return await db.exec(query, [post_id]);
 }
 
 async function add(title, content, user_id, category) {
@@ -82,13 +88,10 @@ async function add(title, content, user_id, category) {
     if(!category) category = "Tout";
 
     const query = `
-    INSERT INTO rs_posts(post_title, post_content, post_user, post_category)
-    VALUES(?, ?, ?, ?)`;
+        INSERT INTO rs_posts(post_title, post_content, post_user, post_category)
+        VALUES(?, ?, ?, ?)`;
 
-    const {error} =  await db.exec(query, [title, content, user_id, category]);
-
-    if(!error) return await db.exec("SELECT LAST_INSERT_ID()", []);
-    else return error;
+    return await db.exec(query, [title, content, user_id, category]);
 }
 
 async function edit(title, content, post_id) {
@@ -102,12 +105,29 @@ async function edit(title, content, post_id) {
     return db.exec(query, [title, content, post_id]);
 }
 
-async function remove(post_id) {
+async function remove(post_id) { // A FAIRE
+
+    await db.exec(`
+        DELETE FROM rs_votes WHERE vote_post = ?
+    `, [post_id]);
+
+    await db.exec(`
+        DELETE FROM rs_files WHERE file_post = ?
+    `, [post_id]);
+
+    await db.exec(`
+        DELETE FROM rs_comments WHERE comment_post = ?
+    `, [post_id]);
+
+    await db.exec(`
+        DELETE FROM rs_reports WHERE report_post = ?
+    `, [post_id]);
+
     const query = `
     DELETE FROM rs_posts
     WHERE post_id = ?`;
     
-    return db.exec(query, [post_id, user_id]);
+    return db.exec(query, [post_id]);
 }
 
 async function voteExists(user, post) {
@@ -161,12 +181,15 @@ async function getVotes(post_id) {
     return db.exec(query, [post_id, post_id]);
 }
 
-async function getComments(post_id) {
+async function getComments(post_id, start, step) {
     const query = `
-    SELECT * FROM rs_comments
-    WHERE comment_post = ?`;
+    SELECT user_name, comment_user, comment_content, comment_date, comment_id
+    FROM rs_comments FULL JOIN rs_users
+    ON comment_user = user_id
+    WHERE comment_post = ?
+    LIMIT ?, ?`;
 
-    return db.exec(query, [post_id]);
+    return db.exec(query, [post_id, start, step]);
 }
 
 
@@ -179,5 +202,6 @@ module.exports = {
     cancelVote,
     addVote,
     getVotes,
-    getComments
+    getComments,
+    getFiles
 }

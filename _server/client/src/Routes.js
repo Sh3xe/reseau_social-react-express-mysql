@@ -1,7 +1,9 @@
-import {Route, Redirect, Link} from "react-router-dom";
+import {Route, Link} from "react-router-dom";
 import React from 'react';
 
 import {UserContext} from "./App.js";
+
+//import Cookies from "js-cookie";
 
 import Home from "./components/Home.js";
 import Post from "./components/Post.js";
@@ -11,6 +13,7 @@ import Login from "./components/Login.js";
 import User from "./components/User.js";
 import Friends from "./components/Friends.js";
 import Upload from "./components/Upload.js";
+import Edit from "./components/Edit.js";
 
 function MyAccountRedirection() {
 
@@ -43,34 +46,30 @@ function CommunityRedirection() {
     );
 }
 
-function ProtectedRoute({component, user, ...params}) {
-    return (
-    <Route 
-        {...params}
-        render={ !user ? () => <Redirect to="/login"/> : () =>{} }
-        component={ user ? component : "" }
-    />);
-}
-
 export default function() {
+
     const {user} = React.useContext(UserContext);
 
     return (
         <main className="container">
-            <ProtectedRoute path="/" exact component={Home} user={user}/>
+            { user !== false ?
+            <React.Fragment>
+                <Route path="/" exact component={Home} />
+                <Route path="/post-redirection" exact component={PostsRedirection} />
+                <Route path="/community-redirection" exact component={CommunityRedirection} />
+                <Route path="/me-redirection" exact component={MyAccountRedirection} />
 
-            <ProtectedRoute path="/post-redirection" exact component={PostsRedirection} user={user}/>
-            <ProtectedRoute path="/community-redirection" exact component={CommunityRedirection} user={user}/>
-            <ProtectedRoute path="/me-redirection" exact component={MyAccountRedirection} user={user}/>
-
-            <ProtectedRoute path="/posts" exact component={Posts} user={user}/>
-            <ProtectedRoute path="/upload" exact component={Upload} user={user}/>
-            <ProtectedRoute path="/user/:user_id" component={User} user={user}/>
-            <ProtectedRoute path="/post/:post_id" component={Post} user={user}/>
-            <ProtectedRoute path="/friends" exact component={Friends} user={user}/>
-
-            <Route path="/login" exact component={Login}/>
-            <Route path="/register" exact component={Register}/>
+                <Route path="/posts" exact component={Posts} />
+                <Route path="/upload" exact component={Upload} />
+                <Route path="/user/:user_id" exact component={User} />
+                <Route path="/post/:post_id" exact component={Post} />
+                <Route path="/post/:post_id/edit" exact component={Edit} />
+                <Route path="/friends" exact component={Friends} /> 
+            </React.Fragment>: <React.Fragment>
+                <Route path="/" exact component={Login}/>
+                <Route path="/register" exact component={Register}/>
+            </React.Fragment>
+            }
         </main>
     );
 }

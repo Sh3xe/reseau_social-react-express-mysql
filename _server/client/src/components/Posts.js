@@ -113,7 +113,7 @@ export default function Posts() {
     }
 
     const handleCategoryChange = function(new_category) {
-        setState({...state, category: new_category});
+        setState({...state, start: 0, category: new_category});
     }
 
     const handlePageChange = function(value) {
@@ -156,7 +156,7 @@ export default function Posts() {
                 />
             </form>
             <div>
-                {message}
+                {JSON.stringify(message)}
             </div>
             <PostsContainer start={state.start} posts={posts} onPageChange={handlePageChange}/>
         </div>

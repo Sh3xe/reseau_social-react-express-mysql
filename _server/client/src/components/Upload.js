@@ -8,6 +8,7 @@ export default function Upload() {
         content:"",
     }
 
+    const select_ref = React.useRef(null);
     const file_input = React.useRef(null);
 
     const [state, setState] = React.useState(start_state);
@@ -38,9 +39,12 @@ export default function Upload() {
 
         const form_data = new FormData();
 
+        const selected_category = select_ref.current.options[select_ref.current.selectedIndex].text;
+
+        form_data.append("category", selected_category);
         form_data.append("title", state.title);
         form_data.append("content", state.content);
-        
+
         for(let file of file_input.current.files) {
             form_data.append("files[]", file);
         }
@@ -74,13 +78,17 @@ export default function Upload() {
                     onChange={handleInputChange} value={state.content}
                 ></textarea>
                 <div>
-                    <label htmlFor="file"> Fichiers </label>
+                    <input
+                        ref={file_input}
+                        type="file" name="file" required multiple
+                    ></input>
                 </div>
-                <input className="input t1"
-                    ref={file_input}
-                    type="file" name="file" required multiple
-                ></input>
                 <button className="button col1" onClick={handleSubmit}> Poster! </button>
+                <select className="select-input" ref={select_ref}>
+                    <option>Tout</option>
+                    <option>Jeux vidéos</option>
+                    <option>Memes</option>
+                </select>
             </form>
         </div>
     );

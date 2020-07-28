@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {BrowserRouter as Router} from "react-router-dom";
-import Cookies from "js-cookie";
+//import Cookies from "js-cookie";
 
 import SiteRouter from "./Routes.js";
 import Navigation from "./components/Navigation.js";
@@ -18,11 +18,12 @@ export default function App() {
     const [user, setUser] = React.useState(undefined);
 
     React.useEffect(() => {
-        if(Cookies.get("user")) {
-            fetch("api/current_user")
-                .then(res => res.json())
-                .then(user => setUser(user))
-        }
+        fetch("api/current_user")
+            .then(res => res.json())
+            .then(user => setUser(user))
+            .catch(() => {
+                setUser(false);
+            })
     }, []);
 
     const value = React.useMemo(() => {
@@ -35,7 +36,7 @@ export default function App() {
     return (
         <UserContext.Provider value={value}>
             <Router>
-                {user ? <Navigation /> : ""}
+                {user !== false && user !== undefined ? <Navigation /> : ""}
                 {user !== undefined ? <SiteRouter /> : ""}
             </Router>
         </UserContext.Provider>

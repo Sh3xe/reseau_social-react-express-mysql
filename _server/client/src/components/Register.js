@@ -91,7 +91,7 @@ export default function Register() {
 
     return (
         <div className="form-container">
-            <header className="login-head">S'enregistrer ou <Link to="/login">S'identifier </Link></header>
+            <header className="login-head">S'enregistrer ou <Link to="/">S'identifier </Link></header>
             <div>{state.messages}</div>
             <form className="login-form">
                 <div>
