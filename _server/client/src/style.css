@@ -12,6 +12,7 @@ body{
 
 a{
     color: black;
+    word-wrap: break-word;
 }
 
 hr{
@@ -176,6 +177,11 @@ ul.dropdown-content a{
     display: block;
 }
 
+.char-counter {
+    font-weight: bold;
+    font-size: 0.8em;
+}
+
 .messages {
     height: 500px;
     overflow-y: scroll;
@@ -336,6 +342,7 @@ ul.dropdown-content a{
 .post-preview-content {
     text-decoration: none;
     font-size: 1.2em;
+    max-width: 356px;
 }
 
 /*SEARCH BAR*/
@@ -430,6 +437,58 @@ ul.dropdown-content a{
 }
 
 /*Forms*/
+
+.vote-form {
+    width: 50px;
+    display: flex;
+    margin-left: auto;
+}
+
+.vote-form * {
+    width: 50%;
+}
+
+.vote-value {
+    text-align: center;
+    line-height: 40px;
+}
+
+.vote-value.up{
+    color: green
+}
+
+.vote-value.down{
+    color: red
+}
+
+.vote-form button {
+    width: 100%;
+    background-color: white;
+    border: 0;
+    border-radius: 3px;
+}
+
+.vote-up {
+    color: green;
+    margin-bottom: 3px;
+}
+
+.vote-up:hover {
+    border: 1px green solid;
+}
+
+.vote-down {
+    color: red;
+}
+
+.vote-down:hover {
+    border: 1px red solid;
+}
+
+.edit-form *{
+    width: 100%;
+    margin-bottom: 1em;
+}
 
 .confirmation-button {
     border: 1px solid grey;
@@ -540,18 +599,185 @@ button.toggle-password{
     width: 80%;
 }
 
-/*POST*/
-.carousel-content {
-    min-width: 100%;
+
+.profil-container{
+    width: 100%;
+    border-radius: 4px;
+    background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0));
+    overflow: hidden;
 }
 
-.carousel {
+.profil-head{
+    width: 100%;
+    height: 250px;
+    color: white;
+    background-color: black;
+}
+
+.profil-head img{
+    width: 100px;
+    height: 100px;
+    float: left;
+    margin: 1em;
+	border: 3px white dashed;
+}
+
+.profil-head h1{
+    padding: 1rem;
+    font-size: 2em;
+    font-weight: bolder;
+    margin: 0;
+}
+
+/*Content*/
+.profil-content{
+    padding: 1rem;
+}
+
+.user-friends,
+.user-bio,
+.user-posts{
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.friend-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 10px;
+    border: 1px solid grey;
+    border-radius: 4px;
+    width: 400px;
+    margin: 1em 0;
+}
+
+.friendcard-infos * {
+    display: block;
+}
+
+.friend-card img{
+    margin-right: 1em;
+    width: 50px;
+    height: 50px;
+}
+
+.friend-card button{
+    margin-left: 1em;
+}
+
+/*PRT1*/
+
+.part1{
+    display: flex;
+    margin-bottom: 1em;
+}
+
+.user-bio{
+    width: 100%;
+}
+
+.user-friends{
+    width: 200px;
+    flex: none;
+}
+
+.userfriend-head,
+.userbio-head,
+.userpost-head{
+    padding: 5px;
+    background-color: black;
+    color: white;
+}
+
+.userpost-content,
+.userbio-content,
+.userfriend-content{
+    /*border: 1px black solid;
+    border-radius: 4px;*/
+    overflow-wrap: break-word;
+    background: white;
+}
+
+/*Bio & friends*/
+.userfriend-content{
+    overflow-y: scroll;
+    overflow-wrap: break-word;
+    height: 400px;
+}
+
+.userbio-content{
+    padding: 5px;
+    height: 400px;
+}
+
+.user-bio{
+    margin-right: 1em;
+}
+
+/*Friends*/
+.friends-list {
+    width: 400px;
+    margin: 0 auto;
+}
+
+.friend{
+    padding: 5px;
+    margin-bottom: 5px;
+}
+
+.friend img{
+    float: left;
+    width: 50px;
+    height: 50px;
+    margin-right: 5px;
+}
+
+.friend a{
+    margin-left: 5px;
+    display: block;
+}
+
+.friend-date {
+    font-size: 0.8em;
+}
+
+/*Posts*/
+.userpost-content{
+    overflow-y: scroll;
+    height: 500px;
+    padding: 5px;
+    /*scrollbar-width: none;*/
+}
+
+.user-posts .page-controller{
+    padding: 5px;
+    background-color: white;
+}
+
+/*
+.userpost-content::-webkit-scrollbar {
+    display: none;
+}*/
+
+/*POST*/
+.slider-content {
+    max-width: 100%;
+    max-height: 400px;
+}
+
+.slider {
     width: 100%;
     max-height: 400px;
     overflow-y: scroll;
 }
 
-.carousel-controller {
+.slider video{
+    max-height: 400px;
+}
+
+.slider-controller {
     display: flex;
     justify-content: space-between;
 }

@@ -3,8 +3,6 @@ import React from 'react';
 
 import {UserContext} from "./App.js";
 
-//import Cookies from "js-cookie";
-
 import Home from "./components/Home.js";
 import Post from "./components/Post.js";
 import Posts from "./components/Posts.js";
@@ -14,11 +12,11 @@ import User from "./components/User.js";
 import Friends from "./components/Friends.js";
 import Upload from "./components/Upload.js";
 import Edit from "./components/Edit.js";
+import Logout from "./components/Logout.js";
+import Dashboard from "./components/Dashboard.js";
 
 function MyAccountRedirection() {
-
     const {user} = React.useContext(UserContext);
-
     return (
         <div className="redirection">
             <Link className="redirection-link" to={`/user/${user.user_id}`}>Profil</Link>
@@ -46,7 +44,7 @@ function CommunityRedirection() {
     );
 }
 
-export default function() {
+export default function Routes() {
 
     const {user} = React.useContext(UserContext);
 
@@ -60,11 +58,14 @@ export default function() {
                 <Route path="/me-redirection" exact component={MyAccountRedirection} />
 
                 <Route path="/posts" exact component={Posts} />
+                <Route path="/logout" exact component={Logout} />
+
                 <Route path="/upload" exact component={Upload} />
                 <Route path="/user/:user_id" exact component={User} />
                 <Route path="/post/:post_id" exact component={Post} />
-                <Route path="/post/:post_id/edit" exact component={Edit} />
+                <Route path="/post/:post_id/edit" component={Edit} />
                 <Route path="/friends" exact component={Friends} /> 
+                <Route path="/dashboard" exact component={Dashboard} /> 
             </React.Fragment>: <React.Fragment>
                 <Route path="/" exact component={Login}/>
                 <Route path="/register" exact component={Register}/>

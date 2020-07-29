@@ -75,8 +75,6 @@ async function getReportsOf({user, comment, post}) {
         params = [post];
     }
 
-    console.log(query, params)
-
     if(query)
         return await db.exec(query, params);
     else return null;

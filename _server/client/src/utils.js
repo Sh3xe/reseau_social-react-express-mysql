@@ -1,3 +1,4 @@
+//Old
 export function sendBody(url, body) {
 
     const params = {
@@ -19,7 +20,8 @@ export function sendBody(url, body) {
     });
 }
 
-export function sendForm({url, method, type}, data, callback) {
+//new
+export function sendForm({url, method, type}, data = {}, callback = (err)=>{}) {
     const xhr = new XMLHttpRequest();
 
     xhr.open(method, url);
@@ -29,8 +31,6 @@ export function sendForm({url, method, type}, data, callback) {
             callback(true, xhr.response);
         } else callback(false, xhr.response);
     };
-
-    console.log(url, method, data)
 
     if(type === "json") {
         xhr.setRequestHeader("Content-Type", "application/json");
@@ -87,7 +87,10 @@ export function addZeros(value, length, filler = "0") {
     } catch(e) { return null }
 }
 
-export function formatDate(d) {
+export function formatDate(str_d) {
+
+    const d = new Date(str_d);
+
 	const {day, month, year, hours, minutes} = {
 		day: addZeros(d.getDate(), 2),
 		month: addZeros(d.getMonth() + 1, 2),
@@ -98,3 +101,19 @@ export function formatDate(d) {
 	
 	return `${day}/${month}/${year}, ${hours}h${minutes}`;
 }
+
+//export function escapeHtmlTags(string) {
+//    if (string)
+//        return string.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+//    else return "";
+//}
+//
+//export function parseMessages(str) {
+//    return str.replace(    /\*(.*?)\*/gi, '<span style="font-style: italic">$1</span>')
+//              .replace(/\*\*(.*?)\*\*/gi, '<span style="font-weight: bold" >$1</span>');
+//}
+//
+//export function escapeAndParse(str) {
+//    str = escapeHtmlTags(str);
+//    return parseMessages(str);
+//}

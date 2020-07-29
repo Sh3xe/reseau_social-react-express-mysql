@@ -4,7 +4,6 @@ const express = require("express");
 const multer = require("multer");
 const router = express.Router();
 
-const loginRequired = require("./loginRequired.js");
 const utils = require("../utils.js");
 const config = require("../../config.js");
 
@@ -18,7 +17,9 @@ const comments = require("../database/comments.js");
 const storage = multer.diskStorage({
     destination: `${__dirname}/../uploads`,
     filename: function(req, file, callback) {
-        callback(null, `${Date.now()}-${file.originalname}`);
+        let extension = file.originalname.split(".");
+        extension = extension[extension.length - 1];
+        callback(null, `${Date.now()}-${utils.generateToken(8)}.${extension}`);
     }
 });
 
@@ -35,7 +36,7 @@ const upload = multer({
     }
 }).array("files[]", 8);
 
-router.get("/post/:id", loginRequired, async(req, res) => {
+router.get("/post/:id", async(req, res) => {
     if(!isNaN(req.params.id)) {
         const {error, data} = await posts.getById(req.params.id);
 
@@ -50,7 +51,7 @@ router.get("/post/:id", loginRequired, async(req, res) => {
     }
 });
 
-router.get("/post/:post_id/files", loginRequired, async(req, res) => {
+router.get("/post/:post_id/files", async(req, res) => {
     const {data, error} = await posts.getFiles(req.params.post_id);
 
     if(!error) {
@@ -61,7 +62,7 @@ router.get("/post/:post_id/files", loginRequired, async(req, res) => {
     }
 });
 
-router.get("/posts", loginRequired, async(req, res) => {
+router.get("/posts", async(req, res) => {
     const {error, data} = await posts.search(req.query);
 
     if(!error) {
@@ -72,22 +73,23 @@ router.get("/posts", loginRequired, async(req, res) => {
     }
 });
 
-router.post("/upload", loginRequired, async(req, res) => {
+router.post("/upload", async(req, res) => {
 	upload(req, res, async(err) => {
         let failed = false;
         const {title, content, category} = req.body;
         const errors = utils.validateForm({ title, content }, {
-            title: {min: 1, max:255},
-            content: {min:1, max:2000}
+            title: {min: 1, max: 57},
+            content: {min:1, max:2500}
         });
-        
+
+        console.log(errors, err)
         if(errors || err) failed = true;
         if(!failed) {
             const post_add = await posts.add(title, content, req.user.user_id, category);
             const files_add = await files.add(req.files, post_add.last_id);
 
             if(!post_add.error && !files_add.error) {
-                res.json(["article ajouté!"]);
+                res.json(post_add.last_id);
                 return;
             }
         }
@@ -96,7 +98,7 @@ router.post("/upload", loginRequired, async(req, res) => {
     })
 });
 
-router.post("/post/:post_id/report", loginRequired, async(req, res) => {
+router.post("/post/:post_id/report", async(req, res) => {
     const {error, data} = await reports.report({
         user: req.user.user_id,
         post: req.params.post_id,
@@ -111,7 +113,7 @@ router.post("/post/:post_id/report", loginRequired, async(req, res) => {
     }
 });
 
-router.delete("/post/:post_id", loginRequired, async(req, res) => {
+router.delete("/post/:post_id", async(req, res) => {
 
     const {error, data} = await posts.getById(req.params.post_id);
 
@@ -127,7 +129,7 @@ router.delete("/post/:post_id", loginRequired, async(req, res) => {
     res.end();
 });
 
-router.post("/post/:post_id/comments", loginRequired, async(req, res) => {
+router.post("/post/:post_id/comments", async(req, res) => {
     const {error, data} = await comments.add(req.params.post_id, req.user.user_id, req.body.content);
 
     if(!error) {
@@ -138,7 +140,7 @@ router.post("/post/:post_id/comments", loginRequired, async(req, res) => {
     }
 });
 
-router.get("/post/:post_id/comments", loginRequired, async(req, res) => {
+router.get("/post/:post_id/comments", async(req, res) => {
     const {error, data} = await posts.getComments(req.params.post_id, req.query.start, req.query.step);
 
     if(!error) {
@@ -149,11 +151,58 @@ router.get("/post/:post_id/comments", loginRequired, async(req, res) => {
     }
 });
 
-router.delete("/post/:post_id/comment/:comment_id", loginRequired, async(req, res) => {
+router.delete("/post/:post_id/comment/:comment_id", async(req, res) => {
     const {error, data} = await comments.remove(req.params.comment_id);
 
     if(!error) {
         res.json(data);
+    } else {
+        res.status(500);
+        res.end();
+    }
+});
+
+router.patch("/post/:post_id", async(req, res) => {
+    const {error, data} = await posts.getById(req.params.post_id);
+
+    if(data[0].post_user === req.user.user_id && !error) {
+        const {title, content, category} = req.body;
+        const {error, data} = await posts.edit(title, content, category, req.params.post_id);
+
+        if(!error) {
+            res.json(data);
+            return;
+        }
+    } 
+    res.status(500);
+    res.end();
+});
+
+router.get("/post/:post_id/votes", async(req, res) => {
+    const {error, data} = await posts.getVotes(req.params.post_id);
+
+    if(!error) {
+        res.json(data);
+    } else {
+        res.status(500);
+        res.end();
+    }
+})
+
+router.put("/post/:post_id/votes", async(req, res) => {
+    let {value} = req.body;
+    let db_call = false;
+
+    if(value !== 0){
+        if(value === -1) value = 0;
+        db_call = await posts.addVote(req.user.user_id, req.params.post_id, value);
+    } else {
+        db_call = await posts.cancelVote(req.user.user_id, req.params.post_id);
+    }
+
+
+    if(!db_call.error) {
+        res.json(db_call.data);
     } else {
         res.status(500);
         res.end();

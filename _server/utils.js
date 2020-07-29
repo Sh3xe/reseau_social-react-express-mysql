@@ -64,11 +64,11 @@ function validateForm(form, conditions) {
 
         } else continue;
 
-        if(min != undefined && value.length <= min) {
+        if(min != undefined && value.length < min) {
             errors.push(`${key} doit être supérieur à ${min}`);
         }
 
-        if(max != undefined && value.length >= max) {
+        if(max != undefined && value.length > max) {
             errors.push(`${key} doit être inférieur à ${max}`);
         }
     }

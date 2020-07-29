@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {BrowserRouter as Router} from "react-router-dom";
-//import Cookies from "js-cookie";
 
 import SiteRouter from "./Routes.js";
 import Navigation from "./components/Navigation.js";
@@ -18,7 +17,7 @@ export default function App() {
     const [user, setUser] = React.useState(undefined);
 
     React.useEffect(() => {
-        fetch("api/current_user")
+        fetch("/api/current_user")
             .then(res => res.json())
             .then(user => setUser(user))
             .catch(() => {
@@ -26,13 +25,11 @@ export default function App() {
             })
     }, []);
 
-    const value = React.useMemo(() => {
-        return {
-            user,
-            setUser
-        }
-    }, [user, setUser]);
-
+    const value = {
+        user,
+        setUser
+    }
+    
     return (
         <UserContext.Provider value={value}>
             <Router>

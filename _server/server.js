@@ -18,22 +18,28 @@ app.use(sessions({ // cookie init
     cookieName: "session",
     sameSite: "Strict",
     secret: config.secret_key,
-    duration: 10 * 60 * 1000,
+    duration: 30 * 60 * 1000,
     ephemeral: true
 }));
 
 // middlewares
 const custom_middlewares = require("./middlewares.js");
 
+app.use(custom_middlewares.logRequests);
+
 app.use(express.static(path.join( __dirname, "/client/build" )));
 app.use(express.static(path.join( __dirname, "/uploads" )));
-app.use(custom_middlewares.logRequests);
 app.use(express.json());
 app.use(custom_middlewares.authenticateUser);
 
 // Routes
-app.use("/api", require("./routes/posts_api.js") );
+const loginRequired = require("./routes/loginRequired.js")
+
+//Login not required
 app.use("/api", require("./routes/authentication_api.js") );
+//Login required
+app.use("/api", loginRequired);
+app.use("/api", require("./routes/posts_api.js") );
 app.use("/api", require("./routes/users_api.js") );
 
 // React App

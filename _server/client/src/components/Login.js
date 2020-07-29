@@ -4,24 +4,7 @@ import {Link} from "react-router-dom";
 import {validateForm, sendForm} from "../utils.js";
 import {UserContext} from "../App.js";
 import Cookies from "js-cookie";
-
-function Message({messages}) {
-    let messages_el = [];
-
-    for(let i = 0; i < messages.length; i++) {
-        const class_name = `log-message ${messages[i].col}`;
-        messages_el.push(
-        <div className={class_name} key={i}>
-            {messages[i].content}
-        </div>);
-    }
-
-    return (
-        <div>
-            {messages_el}
-        </div>
-    );
-}
+import Message from "./Message.js";
 
 export default function Login() {
 
@@ -59,7 +42,7 @@ export default function Login() {
 
         const req_params = {
             method: "POST",
-            url:"api/login",
+            url:"/api/login",
             type:"json"
         }
 

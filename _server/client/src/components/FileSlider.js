@@ -10,10 +10,11 @@ function Page({files, selected}) {
             content = <img 
                 alt=""
                 src={`/${file.file_name}`}
-                className="carousel-content"
+                className="slider-content"
             ></img>
             break;
         case "video":
+            content = "";
             content = <video controls>
                 <source src={`/${file.file_name}`} type={file.file_mime}></source>
             </video>;
@@ -22,7 +23,7 @@ function Page({files, selected}) {
     }
 
     return (
-        <div className="carousel">
+        <div className="slider">
             {content}
         </div>
     );
@@ -44,12 +45,12 @@ function PageSelector({changePage, selected, length}) {
 
     for(let i = 0; i < length; i++) {
         radio_el.push(
-            <input readOnly={true} type="radio" name="carousel-selector" key={i} checked={i === selected ? true : false}></input>
+            <input readOnly={true} type="radio" name="slider-selector" key={i} checked={i === selected ? true : false}></input>
         );
     }
 
     return (
-        <div className="carousel-controller">
+        <div className="slider-controller">
             <button onClick={prev}>&lt;-</button>
             {radio_el}
             <button onClick={next}>-&gt;</button>
@@ -67,7 +68,6 @@ export default function FileSlider({files}) {
     }
 
     //Render
-
     if(!files.length) return <div></div>;
 
     return (

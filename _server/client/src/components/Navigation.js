@@ -33,6 +33,7 @@ export default function() {
                         <ul className="dropdown-content">
                             <li><Link to={`/user/${user.user_id}`}>Profil</Link></li>
                             <li><Link to="/friends">Amis</Link></li>
+                            <li><Link to="/dashboard">Paramètres</Link></li>
                             <li><Link to="/logout">Se deconnecter</Link></li>
                         </ul>
                     </li>

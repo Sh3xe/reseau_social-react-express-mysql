@@ -1,6 +1,7 @@
 "use strict";
 
 const db = require("./DatabaseManager");
+const fs = require("fs");
 
 async function search({search, category, start, step}) {
     // Giving default values for the params object
@@ -94,18 +95,27 @@ async function add(title, content, user_id, category) {
     return await db.exec(query, [title, content, user_id, category]);
 }
 
-async function edit(title, content, post_id) {
+async function edit(title, content, category, post_id) {
     const query = `
     UPDATE rs_posts SET
     post_title = ?,
     post_content = ?,
+    post_category = ?,
     post_edit_date = NOW()
     WHERE post_id = ?`;
     
-    return db.exec(query, [title, content, post_id]);
+    return db.exec(query, [title, content, category, post_id]);
 }
 
-async function remove(post_id) { // A FAIRE
+async function remove(post_id) { // AJOUTER LA SUPPRESSION DES IMAGES
+
+    const files_request = await getFiles(post_id);
+
+    if(files_request.data) {
+        for(let file of files_request.data) {
+            fs.unlinkSync(`${__dirname}/../uploads/${file.file_name}`)
+        }
+    }
 
     await db.exec(`
         DELETE FROM rs_votes WHERE vote_post = ?
@@ -191,7 +201,6 @@ async function getComments(post_id, start, step) {
 
     return db.exec(query, [post_id, start, step]);
 }
-
 
 module.exports = {
     getById,

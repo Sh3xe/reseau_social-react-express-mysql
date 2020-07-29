@@ -1,5 +1,7 @@
 import React from "react";
 
+import Message from "./Message.js";
+
 import {formatDate, getUrlQuery} from "../utils.js";
 import {Link} from "react-router-dom";
 
@@ -12,11 +14,12 @@ function Post({post}) {
                 <div className="post-infos">
                     <span className="post-subtitle">
                         Par <strong><Link to={`/user/${post.post_user}`}>{post.user_name}</Link></strong> le {formatDate(new Date(post.post_date))}
+                        {post.post_date !== post.post_edit_date ? <abbr title={formatDate(post.post_edit_date)}> (Modifié)</abbr> : ""}
                     </span>
                 </div>
             </div>
             <div className="post-preview">
-                <Link className="post-preview-content" to={`/post/${post.post_id}`}>{post.post_title}</Link>
+                <Link className="post-preview-content" to={`/post/${post.post_id}`}>{`${post.post_title.substr(0, 33)}...`}</Link>
             </div>
         </div>
     );
@@ -100,7 +103,7 @@ export default function Posts() {
     });
 
     const [posts, setPosts] = React.useState([]);
-    const [message, setMessage] = React.useState("");
+    const [messages, setMessages] = React.useState([]);
 
     //Functions
     const handleSearchChange = function(e) {
@@ -137,7 +140,7 @@ export default function Posts() {
         fetch(url)
             .then(res => res.json())
             .then(data => setPosts(data))
-            .catch(error => setMessage(error));
+            .catch(error => setMessages([{content: "Erreur de chargement", col:"red"}]));
     };
 
     React.useEffect(searchPosts, [state]);
@@ -155,9 +158,7 @@ export default function Posts() {
                     onChange={handleSearchChange}
                 />
             </form>
-            <div>
-                {JSON.stringify(message)}
-            </div>
+            <Message messages={messages}/>
             <PostsContainer start={state.start} posts={posts} onPageChange={handlePageChange}/>
         </div>
         </React.Fragment>

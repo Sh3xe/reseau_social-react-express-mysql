@@ -1,9 +1,11 @@
 import React from "react";
 
 import {Link} from "react-router-dom";
-import {formatDate, sendForm, getUrlQuery} from "../utils.js";
+import {formatDate, sendForm, getUrlQuery, escapeAndParse} from "../utils.js";
 import {UserContext} from "../App.js";
+
 import FileSlider from "./FileSlider.js";
+import Message from "./Message.js";
 
 function Comments({post_id, history}) {
     //Hooks
@@ -109,11 +111,10 @@ function Comments({post_id, history}) {
     return (
         <React.Fragment>
         <form className="comment-form">
-            <textarea className="input t1"
+            <textarea className="input t1" placeholder="Laisser un commentaier (/250)"
                 onChange={handleFormChange} value={state.comment_content}
             ></textarea>
             <button className="button col1" onClick={handleSubmit}>Submit</button>
-            <span>{state.comment_content.length} / 250</span>
         </form>
         <div className="comments">
             {comment_el}
@@ -149,8 +150,10 @@ function AsideController({curr_user, post_user, post_id, history}) {
     }
 
     const handleReportContentChange = function(e) {
-        const value = e.target.value;
-        setState({...state, report_content: value});
+        if(e.target.value.length <=250) {
+            const value = e.target.value;
+            setState({...state, report_content: value});
+        }
     }
 
     const handleClose = function() {
@@ -204,6 +207,7 @@ function AsideController({curr_user, post_user, post_id, history}) {
 
         { state.message === "report" ?
         <div className="aside-confirmation">
+            <span className="char-counter">{`${state.report_content.length}/250`}</span>
             <textarea 
                 placeholder="Raison (250 charactères)"
                 onChange={handleReportContentChange}
@@ -218,10 +222,82 @@ function AsideController({curr_user, post_user, post_id, history}) {
     );
 }
 
+function VoteForm({post_id}) {
+    //Hooks
+    const [votes, setVotes] = React.useState(0);
+
+    const form_params = {
+        method: "PUT",
+        url: `/api/post/${post_id}/votes`,
+        type: "json"
+    }
+
+    //Function
+    const voteUp = function() {
+        sendForm(form_params, {value: 1}, (err) => {
+            if(!err) fetchVoteValues();
+        });
+    }
+
+    const voteDown = function() {
+        sendForm(form_params, {value: -1}, (err) => {
+            if(!err) fetchVoteValues();
+        });
+    }
+
+    const cancelVote = function() {
+        sendForm(form_params, {value: 0}, (err) => {
+            if(!err) fetchVoteValues();
+        });
+    }
+
+    const fetchVoteValues = function() {
+        fetch(`/api/post/${post_id}/votes`)
+            .then(res => res.json())
+            .then(votes => setVotes(votes[0].value))
+            .catch(() => console.log("can't get the votes"))
+    }
+
+    React.useEffect(() => {
+        fetchVoteValues();
+        // eslint-disable-next-line
+    }, [post_id]);
+
+    //Render
+    return (
+        <div className="vote-form">
+        <div className="vote-buttons">
+            <button className="vote-up" onClick={voteUp}>+</button>
+            <button className="vote-down" onClick={voteDown}>-</button>
+        </div>
+        <div className={`vote-value ${votes < 0 ? "down" : "up"}`} onClick={cancelVote}> {votes} </div>
+        </div>
+    );
+}
+
+function PostContent({post, files}) {
+    return (
+    <div className="post">
+        <div className="post-header">
+            <img src="https://via.placeholder.com/64.png/09f/fff" alt=""/>
+            <div className="post-infos">
+                <h1 className="post-title"> {post.post_title} </h1>
+                <span className="post-subtitle">
+                    Par <strong><Link to={`/user/${post.post_user}`}>{post.user_name}</Link></strong> le {formatDate(new Date(post.post_date))}
+                    {post.post_date !== post.post_edit_date ? `, modifié le ${formatDate(post.post_edit_date)}` : ""}
+                </span>
+            </div>
+            <VoteForm post_id={post.post_id}/>
+        </div>
+        <FileSlider className="" files={files}/>
+        <div className="post-content"> {post.post_content} </div>
+    </div>);
+}
+
 export default function Post(props) {
     //Hooks
     const [post, setPost] = React.useState({});
-    const [message, setMessage] = React.useState("");
+    const [messages, setMessages] = React.useState("");
     const [files, setFiles] = React.useState([]);
 
     const {user} = React.useContext(UserContext);
@@ -232,13 +308,13 @@ export default function Post(props) {
         fetch(`/api/post/${post_id}`)
             .then(res => res.json())
             .then(post => setPost(post))
-            .catch(() => setMessage("Ce post n'existe pas"))
+            .catch(() => setMessages([{content: "Impossible de trouver ce post", col:"red"}]))
 
         fetch(`/api/post/${post_id}/files`)
             .then(res => res.json())
             .then(files => setFiles(files))
             .catch(()=>{
-                setFiles([]);   
+                setFiles([]);
             });
     }, [post_id]);
     
@@ -246,22 +322,10 @@ export default function Post(props) {
         <React.Fragment>
         <aside className="container-aside post-buttons">
             <AsideController post_user={post.post_user} curr_user={user} post_id={post_id} history={props.history}/>
-            {message}
         </aside>
         <div className="container-content">
-            <div className="post">
-                <div className="post-header">
-                    <img src="https://via.placeholder.com/64.png/09f/fff" alt=""/>
-                    <div className="post-infos">
-                        <h1 className="post-title"> {post.post_title} </h1>
-                        <span className="post-subtitle">
-                            Par <strong><Link to={`/user/${post.post_user}`}>{post.user_name}</Link></strong> le {formatDate(new Date(post.post_date))}
-                        </span>
-                    </div>
-                </div>
-                <FileSlider className="" files={files}/>
-                <div className="post-content"> {post.post_content} </div>
-            </div>
+            <Message messages={messages} />
+            <PostContent post={post} files={files}/>
             <hr/>
             <Comments post_id={post.post_id} history={props.history}/>
         </div>

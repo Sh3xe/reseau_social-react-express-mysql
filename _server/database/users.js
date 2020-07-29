@@ -144,26 +144,27 @@ async function getComments(user_id) {
     return db.exec(query, [user_id]);
 }
 
-async function getPosts(id) {
+async function getPosts(id, start, step) {
     const query = `
-    SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, user_name, user_link
+    SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, user_name
     FROM rs_posts
-    INNER JOIN rs_users
-    ON rs_posts.post_user = rs_users.user_id
-    WHERE user_id = ?`;
+    FULL JOIN rs_users
+    ON post_user = user_id
+    WHERE user_id = ?
+    LIMIT ?, ?`;
     
-    return await db.exec(query, [id], true);
+    return await db.exec(query, [id, start, step]);
 }
 
 async function getFriends(user_id) {
     const query = `
-        SELECT relation_user1, relation_user2, user_id, user_name, user_registration, user_status
+        SELECT relation_date, relation_user1, relation_user2, user_id, user_name, user_registration, user_status
         FROM rs_relations FULL JOIN rs_users
         ON relation_user1 = user_id
         OR relation_user2 = user_id
         WHERE (relation_user1 = ? OR relation_user2 = ?)
         AND relation_status = "friends" 
-        AND user_id != ?`;
+        AND user_id != ? `;
     
     return db.exec(query, [user_id, user_id, user_id]);
 }
