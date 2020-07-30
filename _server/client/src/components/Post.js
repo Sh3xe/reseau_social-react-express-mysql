@@ -279,7 +279,7 @@ function PostContent({post, files}) {
     return (
     <div className="post">
         <div className="post-header">
-            <img src="https://via.placeholder.com/64.png/09f/fff" alt=""/>
+            <img src="/default_pp.png" alt=""/>
             <div className="post-infos">
                 <h1 className="post-title"> {post.post_title} </h1>
                 <span className="post-subtitle">

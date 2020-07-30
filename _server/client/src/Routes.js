@@ -21,6 +21,7 @@ function MyAccountRedirection() {
         <div className="redirection">
             <Link className="redirection-link" to={`/user/${user.user_id}`}>Profil</Link>
             <Link className="redirection-link" to="/friends">Amis</Link>
+            <Link className="redirection-link" to="/dashboard">Paramètres</Link>
             <Link className="redirection-link" to="/logout">Se deconnecter</Link>
         </div>
     );

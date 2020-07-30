@@ -35,7 +35,7 @@ async function acceptRequest(from, to) {
     const query = `
         UPDATE rs_relations
         SET relation_status = "friends",
-        SET relation_date = NOW()
+        relation_date = NOW()
         WHERE relation_user2 = ? AND relation_user1 = ? `;
 
     return db.exec(query, [from, to]);

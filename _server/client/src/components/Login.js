@@ -3,7 +3,6 @@ import {Link} from "react-router-dom";
 
 import {validateForm, sendForm} from "../utils.js";
 import {UserContext} from "../App.js";
-import Cookies from "js-cookie";
 import Message from "./Message.js";
 
 export default function Login() {
@@ -49,14 +48,12 @@ export default function Login() {
         sendForm(req_params, form_data, (err, res) => {
             if(!err) {
                 const user = JSON.parse(res);
-                Cookies.set("user", true);
                 setUser(user);
                 setState({
                     ...state,
                     messages: [{col:"green", content: `Identifié en tant que "${user.user_name}"`}]
                 });
             } else {
-                Cookies.set("user", false);
                 setState({
                     ...state,
                     messages: [{col:"red", content: res}]

@@ -6,6 +6,29 @@ const bcrypt = require("bcryptjs");
 const {generateToken} = require("../utils.js");
 const config = require("../../config.js");
 
+async function search({search_query, start, step}) {
+    // Giving default values for the params object
+    if(!start || !step) {
+        start = 0;
+        step = 15;
+    }
+
+    if(search_query) {
+        let query = `
+            SELECT user_name, user_id, user_registration FROM rs_users
+            WHERE user_name LIKE ?
+            LIMIT ?, ?`;
+
+        return await db.exec(query, [`%${search_query}%`, start, step]);     
+    } else {
+        const query = `
+            SELECT user_name, user_id, user_registration FROM rs_users
+            LIMIT ?, ?`;
+        
+        return await db.exec(query, [start, step]);
+    }
+}
+
 async function getByToken(user_token) {
     const query = `
         SELECT 
@@ -171,7 +194,7 @@ async function getFriends(user_id) {
 
 async function getRequests(user_id){
     const query = `
-        SELECT relation_user1, relation_user2, user_id, user_name, user_registration, user_status, user_grade
+        SELECT relation_user1, relation_user2, user_id, user_name, user_registration, user_status
         FROM rs_relations FULL JOIN rs_users
         ON relation_user1 = user_id
         OR relation_user2 = user_id
@@ -193,5 +216,6 @@ module.exports = {
     getComments,
     getPosts,
     getFriends,
-    getRequests
+    getRequests,
+    search
 }

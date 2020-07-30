@@ -6,6 +6,25 @@ const router = express.Router();
 const users = require("../database/users.js");
 const relations = require("../database/relations.js");
 
+//GET
+router.get("/users", async(req, res) => {
+    // search for users
+    console.log(req.query)
+    const search_params = {
+        search_query: req.query.search,
+        start: req.query.start,
+        step: req.query.step
+    }
+
+    const {error, data} = await users.search(search_params);
+    if(!error) {
+        res.json(data);
+    } else {
+        res.status(400);
+        res.end();
+    }
+});
+
 router.get("/current_user", async(req, res) => {
     // Returns the information of the user who sent the request
     const {data, error} = await users.getByToken(req.session.user_token);
@@ -70,6 +89,26 @@ router.get("/user/:user_id/friends", async(req, res)=> {
     }
 });
 
+router.get("/user/:user_id/requests", async(req, res) => {
+    if(req.params.user_id == req.user.user_id) {
+        const {error, data} = await users.getRequests(req.user.user_id);
+
+        if(!error) {
+            res.json(data);
+            res.end();
+            return;
+        } else {
+            console.log(error)
+            res.status(500);
+            res.end();
+            return;
+        }
+    }
+    res.status(403);
+    res.end();
+});
+
+//POST
 router.post("/user/:user_id/friends", async(req, res)=> {
     // The user who sent the http request send a friend request
     // to user_id
@@ -95,6 +134,7 @@ router.post("/user/:user_id/friends", async(req, res)=> {
     res.end();
 });
 
+//PUT
 router.put("/user/:user_id/friends", async(req, res)=> {
     // The user who sent the http request will accept
     // the friend request of user_id
@@ -111,6 +151,7 @@ router.put("/user/:user_id/friends", async(req, res)=> {
         if(!error) {
             res.json(data);
         } else {
+            console.log(error)
             res.status(400);
             res.end();
         }
@@ -120,6 +161,7 @@ router.put("/user/:user_id/friends", async(req, res)=> {
     res.end();
 });
 
+//DELETE
 router.delete("/user/:user_id/friends", async(req, res)=> {
 
     // The user who sent the http request will remove

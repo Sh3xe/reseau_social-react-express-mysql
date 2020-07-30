@@ -1,7 +1,6 @@
 import React from "react";
 
 import Message from "./Message.js";
-
 import {formatDate, getUrlQuery} from "../utils.js";
 import {Link} from "react-router-dom";
 
@@ -10,7 +9,7 @@ function Post({post}) {
     return (
         <div className="post">
             <div className="post-header">
-                <img src="https://via.placeholder.com/64.png/09f/fff" alt=""/>
+                <img src="/default_pp.png" alt=""/>
                 <div className="post-infos">
                     <span className="post-subtitle">
                         Par <strong><Link to={`/user/${post.post_user}`}>{post.user_name}</Link></strong> le {formatDate(new Date(post.post_date))}
@@ -98,11 +97,11 @@ export default function Posts() {
     const [state, setState] = React.useState({
         category: "Tout",
         search: "",
-        start: 0,
-        step: 15
+        start: 0
     });
 
     const [posts, setPosts] = React.useState([]);
+    const [search_timeout, setSearchTimeout] = React.useState(null);
     const [messages, setMessages] = React.useState([]);
 
     //Functions
@@ -131,7 +130,7 @@ export default function Posts() {
         const url_query = getUrlQuery({
             start: state.start,
             search: state.search,
-            step: state.step,
+            step: 15,
             category: state.category
         }); // returns a "?key1=value1&key2=val2"
 
@@ -140,10 +139,19 @@ export default function Posts() {
         fetch(url)
             .then(res => res.json())
             .then(data => setPosts(data))
-            .catch(error => setMessages([{content: "Erreur de chargement", col:"red"}]));
+            .catch(() => setMessages([{content: "Erreur de chargement", col:"red"}]));
     };
 
-    React.useEffect(searchPosts, [state]);
+    React.useEffect(searchPosts, [state.category, state.start]);
+
+    React.useEffect(() => {
+        if(search_timeout) {
+            clearTimeout(search_timeout);
+        }
+        
+        setSearchTimeout(setTimeout(searchPosts, 500));
+
+    }, [state.search]);
 
     //Page
     return (
