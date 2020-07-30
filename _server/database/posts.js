@@ -17,7 +17,7 @@ async function search({search, category, start, step}) {
         let search_command = null;
         let category_command = null;
         
-        if(category && category.length) {
+        if(category && category.length && category != "Tout") {
             category_command = "post_category = ?";
             params_array.push(category);
         }
@@ -45,10 +45,11 @@ async function search({search, category, start, step}) {
             we add an "AND" between them if there is both
         */
         let query = `
-            SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, post_category, user_name
+            SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, post_category, user_name, post_views
             FROM rs_posts FULL JOIN rs_users
             ON user_id = post_user
-            WHERE ${category_command || ""}
+            ${ (category_command || search_command) ? "WHERE" : "" }
+            ${category_command || ""}
             ${ (category_command && search_command) ? "AND" : "" }
             ${ search_command ? `(${search_command})` : "" }
             LIMIT ?, ?`;
@@ -68,7 +69,7 @@ async function search({search, category, start, step}) {
 
 async function getById(id) {
     const query = `
-    SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, post_category, user_name
+    SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, post_category, user_name, post_views
     FROM rs_posts FULL JOIN rs_users ON post_user = user_id
     WHERE post_id = ?`;
 
@@ -193,13 +194,23 @@ async function getVotes(post_id) {
 
 async function getComments(post_id, start, step) {
     const query = `
-    SELECT user_name, comment_user, comment_content, comment_date, comment_id
+    SELECT user_name, comment_user, comment_content, comment_date, comment_id, comment_post
     FROM rs_comments FULL JOIN rs_users
     ON comment_user = user_id
     WHERE comment_post = ?
+    ORDER BY comment_date DESC
     LIMIT ?, ?`;
 
     return db.exec(query, [post_id, start, step]);
+}
+
+async function addViews(post_id) {
+    const query = `
+        UPDATE rs_posts
+        SET post_views = post_views + 1
+        WHERE post_id = ?`;
+
+    return db.exec(query, [post_id]);
 }
 
 module.exports = {
@@ -212,5 +223,6 @@ module.exports = {
     addVote,
     getVotes,
     getComments,
-    getFiles
+    getFiles,
+    addViews
 }

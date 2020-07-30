@@ -204,6 +204,15 @@ async function getRequests(user_id){
     
     return db.exec(query, [user_id, user_id, user_id]);
 }
+/*
+async function getStats(user_id) {
+    const query = `
+        SELECT COUNT(post_views), COUNT(*)
+        FROM rs_posts WHERE post_user = ?`;
+
+    return db.exec(query, user_id);
+}
+*/
 
 module.exports = {
     getByToken,

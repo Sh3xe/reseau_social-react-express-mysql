@@ -12,7 +12,6 @@ const posts = require("../database/posts.js");
 const files = require("../database/files.js");
 const comments = require("../database/comments.js");
 
-
 //Multer init for files upload
 const storage = multer.diskStorage({
     destination: `${__dirname}/../uploads`,
@@ -36,6 +35,7 @@ const upload = multer({
     }
 }).array("files[]", 8);
 
+//GET
 router.get("/post/:id", async(req, res) => {
     if(!isNaN(req.params.id)) {
         const {error, data} = await posts.getById(req.params.id);
@@ -73,6 +73,29 @@ router.get("/posts", async(req, res) => {
     }
 });
 
+router.get("/post/:post_id/comments", async(req, res) => {
+    const {error, data} = await posts.getComments(req.params.post_id, req.query.start, req.query.step);
+
+    if(!error) {
+        res.json(data);
+    } else {
+        res.status(500);
+        res.end();
+    }
+});
+
+router.get("/post/:post_id/votes", async(req, res) => {
+    const {error, data} = await posts.getVotes(req.params.post_id);
+
+    if(!error) {
+        res.json(data);
+    } else {
+        res.status(500);
+        res.end();
+    }
+})
+
+//POST
 router.post("/upload", async(req, res) => {
 	upload(req, res, async(err) => {
         let failed = false;
@@ -113,6 +136,22 @@ router.post("/post/:post_id/report", async(req, res) => {
     }
 });
 
+router.post("/post/:post_id/comments", async(req, res) => {
+    const {error, data} = await comments.add(req.params.post_id, req.user.user_id, req.body.content);
+
+    if(!error) {
+        res.json(data);
+    } else {
+        res.status(500);
+        res.end();
+    }
+});
+
+router.post("/post/:post_id/views", async(req, res) => {
+    posts.addViews(req.params.post_id);
+});
+
+//DELETE
 router.delete("/post/:post_id", async(req, res) => {
 
     const {error, data} = await posts.getById(req.params.post_id);
@@ -129,30 +168,8 @@ router.delete("/post/:post_id", async(req, res) => {
     res.end();
 });
 
-router.post("/post/:post_id/comments", async(req, res) => {
-    const {error, data} = await comments.add(req.params.post_id, req.user.user_id, req.body.content);
-
-    if(!error) {
-        res.json(data);
-    } else {
-        res.status(500);
-        res.end();
-    }
-});
-
-router.get("/post/:post_id/comments", async(req, res) => {
-    const {error, data} = await posts.getComments(req.params.post_id, req.query.start, req.query.step);
-
-    if(!error) {
-        res.json(data);
-    } else {
-        res.status(500);
-        res.end();
-    }
-});
-
 router.delete("/post/:post_id/comment/:comment_id", async(req, res) => {
-    const {error, data} = await comments.remove(req.params.comment_id);
+    const {error, data} = await comments.remove(req.params.comment_id, req.user.user_id);
 
     if(!error) {
         res.json(data);
@@ -162,6 +179,7 @@ router.delete("/post/:post_id/comment/:comment_id", async(req, res) => {
     }
 });
 
+//PATCH
 router.patch("/post/:post_id", async(req, res) => {
     const {error, data} = await posts.getById(req.params.post_id);
 
@@ -178,8 +196,11 @@ router.patch("/post/:post_id", async(req, res) => {
     res.end();
 });
 
-router.get("/post/:post_id/votes", async(req, res) => {
-    const {error, data} = await posts.getVotes(req.params.post_id);
+router.patch("/post/:post_id/comment/:comment_id", async(req, res) => {
+
+    const {content} = req.body;
+
+    const {error, data} = await comments.edit(req.params.comment_id, req.user.user_id, content);
 
     if(!error) {
         res.json(data);
@@ -187,8 +208,9 @@ router.get("/post/:post_id/votes", async(req, res) => {
         res.status(500);
         res.end();
     }
-})
+});
 
+//PUT
 router.put("/post/:post_id/votes", async(req, res) => {
     let {value} = req.body;
     let db_call = false;

@@ -4,17 +4,16 @@ import Message from "./Message.js";
 import {formatDate, getUrlQuery} from "../utils.js";
 import {Link} from "react-router-dom";
 
-// post_id, post_title, post_content, post_user, post_date, post_edit_date, post_category, user_name
 function Post({post}) {
     return (
         <div className="post">
             <div className="post-header">
                 <img src="/default_pp.png" alt=""/>
                 <div className="post-infos">
-                    <span className="post-subtitle">
+                    <div className="post-subtitle">
                         Par <strong><Link to={`/user/${post.post_user}`}>{post.user_name}</Link></strong> le {formatDate(new Date(post.post_date))}
-                        {post.post_date !== post.post_edit_date ? <abbr title={formatDate(post.post_edit_date)}> (Modifié)</abbr> : ""}
-                    </span>
+                    </div>
+                    <div className="post-subtitle"> {post.post_date !== post.post_edit_date ? <abbr title={formatDate(post.post_edit_date)}> (Modifié)</abbr> : ""} {post.post_views} vue(s)</div>
                 </div>
             </div>
             <div className="post-preview">

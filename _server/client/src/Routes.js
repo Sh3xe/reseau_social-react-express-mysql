@@ -1,4 +1,4 @@
-import {Route, Link} from "react-router-dom";
+import {Route, Link, Redirect} from "react-router-dom";
 import React from 'react';
 
 import {UserContext} from "./App.js";
@@ -45,6 +45,12 @@ function CommunityRedirection() {
     );
 }
 
+function NotFound() {
+    return (
+        <h1>404 Cette page n'existe pas.</h1>
+    );
+}
+
 export default function Routes() {
 
     const {user} = React.useContext(UserContext);
@@ -67,9 +73,13 @@ export default function Routes() {
                 <Route path="/post/:post_id/edit" component={Edit} />
                 <Route path="/friends" exact component={Friends} /> 
                 <Route path="/dashboard" exact component={Dashboard} /> 
+
+                <Redirect from="*" to="/not-found"/>
+                <Route path="/not-found" component={NotFound}/>
             </React.Fragment>: <React.Fragment>
-                <Route path="/" exact component={Login}/>
                 <Route path="/register" exact component={Register}/>
+                <Redirect from="*" to="/login"/>
+                <Route path="/" exact component={Login}/>
             </React.Fragment>
             }
         </main>

@@ -827,6 +827,10 @@ button.toggle-password{
     margin-bottom: 10px;
 }
 
+textarea.edit-comment {
+    border: 0;
+}
+
 .comment-form{
     margin: 1em 0;
     width: 100%;

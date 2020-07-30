@@ -10,21 +10,21 @@ async function add(post, user, content) {
     return db.exec(query, [post, user, content]);
 }
 
-async function remove(comment_id) {
+async function remove(comment_id, user_id) {
     const query = `
         DELETE FROM rs_comments
-        WHERE comment_id = ?`;
+        WHERE comment_id = ? AND comment_user = ?`;
 
-    return db.exec(query, [comment_id]);
+    return db.exec(query, [comment_id, user_id]);
 }
 
-async function edit(comment_id, content) {
+async function edit(comment_id, user_id, content) {
     const query = `
         UPDATE rs_comments
         SET comment_content = ?
-        WHERE comment_id = ?`;
+        WHERE comment_id = ? AND comment_user = ?`;
     
-    return db.exec(query, [content, comment_id]);
+    return db.exec(query, [content, comment_id, user_id]);
 }
 
 module.exports = {

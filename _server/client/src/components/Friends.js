@@ -151,7 +151,7 @@ function UserCard({user}) {
             <img src="/default_pp.png" alt=""/>
             <div className="usercard-infos">
                 <Link to={`/user/${user.user_id}`}>{user.user_name}</Link>
-                <span>Arrivé(e) {formatDate(user.user_registration)}</span>
+                <span>Arrivé(e) le {formatDate(user.user_registration)}</span>
             </div>
         </div>
     );
@@ -233,7 +233,7 @@ function FriendSearch() {
         <div className="friend-section_container">
             <form action="" method="get" className="search-bar">
                 <input 
-                    type="text" className="input t2" placeholder="Rechercher" 
+                    type="text" className="input t1" placeholder="Rechercher" 
                     onChange={handleSearchChange} value={state.search}
                 />
             </form>
@@ -264,15 +264,15 @@ function FriendMenu({changeSection}) {
             <span 
                 className="friend-link"
                 onClick={() => setSelected("friends")}
-            >Friends</span>
+            >Amis</span>
             <span 
                 className="friend-link"
                 onClick={() => setSelected("requests")}
-            >Requests</span>
+            >Requêtes</span>
             <span 
                 className="friend-link"
                 onClick={() => setSelected("search")}
-            >Search</span>
+            >Rechercher</span>
         </div>
     );
 }

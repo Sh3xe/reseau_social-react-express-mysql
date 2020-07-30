@@ -6,9 +6,7 @@ const chalk = require("chalk");
 const mysql = require("mysql2");
 
 class DataBase {
-
     constructor({host, user, database, password}) {
-        
         this.pool = mysql.createPool({
             connectionLimit: 10,
             user,
@@ -19,7 +17,7 @@ class DataBase {
     }
 
     exec(query, params, res_required = false) {
-        //console.log(query, params);
+        // console.log(query, params);
         // return an error and a data object
         return new Promise((resolve, reject)=>{
             this.pool.getConnection((error, connection)=>{

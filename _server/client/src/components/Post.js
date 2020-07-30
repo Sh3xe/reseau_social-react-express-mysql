@@ -7,7 +7,81 @@ import {UserContext} from "../App.js";
 import FileSlider from "./FileSlider.js";
 import Message from "./Message.js";
 
-function Comments({post_id, history}) {
+function Comment({comment, refresh}) {
+    //Hooks
+    const {user} = React.useContext(UserContext);
+
+    const [state, setState] = React.useState({
+        editing: false,
+        comment_content: comment.comment_content
+    });
+
+    //Functions
+    const deleteComment = function() {
+        fetch(`/api/post/${comment.comment_post}/comment/${comment.comment_id}`, {
+            method: "DELETE"
+        }).then(() => refresh());
+    }
+
+    const toggleEditState = function() {
+        if(state.editing) {
+            const params = {
+                url: `/api/post/${comment.comment_post}/comment/${comment.comment_id}`,
+                method: "PATCH",
+                type: "json"
+            }
+
+            sendForm(params, {content: state.comment_content}, (err) => {
+                if(!err) refresh();
+            });
+        }
+        setState({...state, editing: !state.editing});
+    }
+
+    const cancelEdit = function() {
+        setState({
+            ...state,
+            comment_content: comment.comment_content,
+            editing: false
+        });
+    }
+
+    const handleCommentChange = function(e) {
+        const value = e.target.value;
+        if(state.editing && value.length <= 250) {
+            setState({...state, comment_content: value});
+        }
+    }
+
+    //Render
+    return (
+        <div className="comment">
+            <div className="comment-header">
+                Par <Link to={`/user/${comment.comment_user}`}>{comment.user_name}</Link> le {formatDate(new Date(comment.comment_date))}
+                { user.user_id === comment.comment_user ?
+                    <React.Fragment>
+                        <button className="confirmation-button" onClick={deleteComment}>Supprimer</button>
+                        {state.editing ? <button className="confirmation-button" onClick={cancelEdit}>Annuler</button> : ""}
+                        <button className="confirmation-button" onClick={toggleEditState}>
+                            { state.editing ? "Enregister" : "Modifier"}
+                        </button> { state.editing ? `${state.comment_content.length}/250` : ""}
+                    </React.Fragment> : ""
+                }
+            </div>
+            <div className="comment-content"> 
+                { state.editing ? 
+                    <textarea className="edit-comment" 
+                        value={state.comment_content}
+                        onChange={handleCommentChange}
+                    ></textarea> :
+                    comment.comment_content
+                }
+            </div>
+        </div>
+    );
+}
+
+function Comments({post_id}) {
     //Hooks
     const [state, setState] = React.useState({
         comment_content: "",
@@ -15,18 +89,15 @@ function Comments({post_id, history}) {
         step: 9
     });
 
-    const {user} = React.useContext(UserContext);
     const [comments, setComments] = React.useState([]);
+    const [comments_el, setCommentsElement] = React.useState([]);
 
     //Functions
     const handleFormChange = function(e) {
         const value = e.target.value;
-        if(value.length > 250) return;
-
-        setState({
-            ...state,
-            comment_content: value
-        });
+        if(value.length <= 250) {
+            setState({...state, comment_content: value });
+        }
     }
 
     const handleSubmit = function(e) {
@@ -44,36 +115,9 @@ function Comments({post_id, history}) {
 
         sendForm(params, form_body, (err) => {
             if(!err) {
-                history.push(`/post/${post_id}`);
+                getComments();
             } else console.log("problème");
         });
-    }
-
-    const deleteComment = function(comment_id) {
-        fetch(`/api/post/${post_id}/comment/${comment_id}`, {
-            method: "DELETE"
-        });
-    }
-
-    const getCommentsElement = function() {
-        let el = [];
-        for(let i = 0; i < comments.length; i++) {
-            el.push(
-                <div className="comment" key={i}>
-                    <div className="comment-header">
-                        Par <Link to={`/user/${comments[i].comment_user}`}>{comments[i].user_name}</Link> le {formatDate(new Date(comments[i].comment_date))}
-                        { user.user_id === comments[i].comment_user ?
-                            <button className="confirmation-button" onClick={() => {
-                                deleteComment(comments[i].comment_id)
-                            }}>Supprimer</button> : ""
-                        }
-                    </div>
-                    <div className="comment-content"> {comments[i].comment_content}</div>
-                </div>
-            );
-        }
-
-        return el;
     }
 
     const prev = function() {
@@ -94,7 +138,7 @@ function Comments({post_id, history}) {
         }
     }
 
-    React.useEffect(() => {
+    const getComments = function() {
         const url_query = getUrlQuery({
             start: state.start,
             step: 9
@@ -104,20 +148,31 @@ function Comments({post_id, history}) {
             .then(res => res.json())
             .then(data => setComments(data))
             .catch(() => console.log("pasbien"))
-    }, [post_id, state.start]);
+    }
 
-    let comment_el = getCommentsElement();
+    React.useEffect(getComments, [post_id, state.start]);
+
+    React.useEffect(() => {
+        let el = [];
+        for(let i = 0; i < comments.length; i++) {
+            el.push(
+                <Comment key={i} comment={comments[i]} refresh={getComments}/>
+            );
+        }
+        setCommentsElement(el);
+    }, [comments]);
 
     return (
         <React.Fragment>
         <form className="comment-form">
-            <textarea className="input t1" placeholder="Laisser un commentaier (/250)"
+            <textarea className="input t1" placeholder="Laisser un commentaire"
                 onChange={handleFormChange} value={state.comment_content}
             ></textarea>
             <button className="button col1" onClick={handleSubmit}>Submit</button>
+            <span className="char-counter">{`${state.comment_content.length}/250`}</span>
         </form>
         <div className="comments">
-            {comment_el}
+            {comments_el}
             { comments.length > 8 || state.start >=8?
             <div className="page-controller">
                 <button className="button norm" onClick={prev}>Page précédente</button>
@@ -260,7 +315,6 @@ function VoteForm({post_id}) {
 
     React.useEffect(() => {
         fetchVoteValues();
-        // eslint-disable-next-line
     }, [post_id]);
 
     //Render
@@ -282,10 +336,11 @@ function PostContent({post, files}) {
             <img src="/default_pp.png" alt=""/>
             <div className="post-infos">
                 <h1 className="post-title"> {post.post_title} </h1>
-                <span className="post-subtitle">
+                <div className="post-subtitle">
                     Par <strong><Link to={`/user/${post.post_user}`}>{post.user_name}</Link></strong> le {formatDate(new Date(post.post_date))}
-                    {post.post_date !== post.post_edit_date ? `, modifié le ${formatDate(post.post_edit_date)}` : ""}
-                </span>
+                    {post.post_date !== post.post_edit_date ? `, modifié le ${formatDate(post.post_edit_date)}` : ""} 
+                    , {post.post_views} vue(s)
+                </div>
             </div>
             <VoteForm post_id={post.post_id}/>
         </div>
@@ -316,6 +371,8 @@ export default function Post(props) {
             .catch(()=>{
                 setFiles([]);
             });
+
+        fetch(`/api/post/${post_id}/views`, {method: "POST"});
     }, [post_id]);
     
     return (

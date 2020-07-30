@@ -9,7 +9,6 @@ const relations = require("../database/relations.js");
 //GET
 router.get("/users", async(req, res) => {
     // search for users
-    console.log(req.query)
     const search_params = {
         search_query: req.query.search,
         start: req.query.start,
