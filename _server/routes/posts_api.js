@@ -105,7 +105,6 @@ router.post("/upload", async(req, res) => {
             content: {min:1, max:2500}
         });
 
-        console.log(errors, err)
         if(errors || err) failed = true;
         if(!failed) {
             const post_add = await posts.add(title, content, req.user.user_id, category);

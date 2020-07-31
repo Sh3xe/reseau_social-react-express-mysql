@@ -10,7 +10,7 @@ function UserPost({post}) {
     return (
         <div className="post">
             <div className="post-header">
-                <img src="/default_pp.png" alt=""/>
+                <img src={`/${post.user_avatar}`} alt=""/>
                 <div className="post-infos">
                     <h1 className="post-title"> <Link to={`/post/${post.post_id}`} >{post.post_title}</Link> </h1>
                     <span className="post-subtitle">
@@ -86,7 +86,7 @@ function UserContent({user_id}) {
 function Friend({user}) {
     return (
         <div className="friend">
-            <img src="/default_pp.png" alt=""/>
+            <img src={`/${user.user_avatar}`} alt=""/>
             <Link to={`/user/${user.user_id}`}>{user.user_name}</Link>
             <span className="friend-date">Amis depuis {formatDate(user.relation_date)}</span>
         </div>
@@ -233,7 +233,7 @@ export default function User() {
     return (
         <div className="profil-container">
             <div className="profil-head">
-                <img src="/default_pp.png" alt=""/>
+                <img src={`/${user.user_avatar}`} alt=""/>
                 <h1>{user.user_name}</h1>
                 <FriendButton user_id={user_id}/>
             </div>

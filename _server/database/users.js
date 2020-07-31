@@ -15,14 +15,14 @@ async function search({search_query, start, step}) {
 
     if(search_query) {
         let query = `
-            SELECT user_name, user_id, user_registration FROM rs_users
+            SELECT user_name, user_id, user_registration, user_avatar FROM rs_users
             WHERE user_name LIKE ?
             LIMIT ?, ?`;
 
         return await db.exec(query, [`%${search_query}%`, start, step]);     
     } else {
         const query = `
-            SELECT user_name, user_id, user_registration FROM rs_users
+            SELECT user_name, user_id, user_registration, user_avatar FROM rs_users
             LIMIT ?, ?`;
         
         return await db.exec(query, [start, step]);
@@ -35,7 +35,7 @@ async function getByToken(user_token) {
             user_name, user_email,
             user_bio, user_token,
             user_status, user_registration,
-            user_id
+            user_id, user_avatar
         FROM rs_users
         WHERE user_token = ?`;
 
@@ -49,7 +49,7 @@ async function getById(user_id) {
             user_name, user_email,
             user_bio, user_token,
             user_status, user_registration,
-            user_id
+            user_id, user_avatar
         FROM rs_users
         WHERE user_id = ?`;
 
@@ -105,13 +105,13 @@ async function add(name, email, password) {
     return await db.exec(query, [email, hashed_password, name, token ]);
 }
 
-async function update(user_id, {name, email, password, bio, status}) {
+async function update(user_id, {name, email, password, bio, status, avatar}) {
 
     let fields = "";
     let params = [];
 
     if(name) {
-        fields += " user_name = ?";
+        fields += " user_name = ?,";
         params.push(name);
     }
 
@@ -137,6 +137,11 @@ async function update(user_id, {name, email, password, bio, status}) {
         const hashed_password = bcrypt.hashSync(password, salt);
 
         params.push(hashed_password);
+    }
+
+    if(avatar) {
+        fields += " user_avatar = ?,"
+        params.push(avatar);
     }
 
     fields = fields.slice(0, fields.length - 1);
@@ -169,7 +174,7 @@ async function getComments(user_id) {
 
 async function getPosts(id, start, step) {
     const query = `
-    SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, user_name
+    SELECT post_id, post_title, post_content, post_user, post_date, post_edit_date, user_name, user_avatar
     FROM rs_posts
     FULL JOIN rs_users
     ON post_user = user_id
@@ -181,7 +186,7 @@ async function getPosts(id, start, step) {
 
 async function getFriends(user_id) {
     const query = `
-        SELECT relation_date, relation_user1, relation_user2, user_id, user_name, user_registration, user_status
+        SELECT relation_date, relation_user1, relation_user2, user_id, user_name, user_registration, user_status, user_avatar
         FROM rs_relations FULL JOIN rs_users
         ON relation_user1 = user_id
         OR relation_user2 = user_id
@@ -204,6 +209,7 @@ async function getRequests(user_id){
     
     return db.exec(query, [user_id, user_id, user_id]);
 }
+
 /*
 async function getStats(user_id) {
     const query = `

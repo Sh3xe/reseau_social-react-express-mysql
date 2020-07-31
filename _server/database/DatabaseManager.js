@@ -17,7 +17,7 @@ class DataBase {
     }
 
     exec(query, params, res_required = false) {
-        // console.log(query, params);
+         console.log(query, params);
         // return an error and a data object
         return new Promise((resolve, reject)=>{
             this.pool.getConnection((error, connection)=>{

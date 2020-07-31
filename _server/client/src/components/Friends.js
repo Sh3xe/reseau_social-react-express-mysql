@@ -20,7 +20,7 @@ function FriendCard({friend}) {
 
     return (
         <div className="friend-card">
-            <img src="/default_pp.png" alt=""/>
+            <img src={`/${user.user_avatar}`} alt=""/>
             <div className="friendcard-infos">
                 <Link to={`/user/${friend.user_id}`}>{friend.user_name}</Link>
                 <span>Depuis {formatDate(friend.relation_date)}</span>
@@ -97,7 +97,7 @@ function RequestCard({request, refresh}) {
 
     return (
         <div className="friend-card">
-            <img src="/default_pp.png" alt=""/>
+            <img src={`/${user.user_avatar}`} alt=""/>
             <div className="friendcard-infos">
                 <Link to={`/user/${request.user_id}`}>{request.user_name}</Link>
             </div>
@@ -148,7 +148,7 @@ function RequestList() {
 function UserCard({user}) {
     return (
         <div className="user-card">
-            <img src="/default_pp.png" alt=""/>
+            <img src={`/${user.user_avatar}`} alt=""/>
             <div className="usercard-infos">
                 <Link to={`/user/${user.user_id}`}>{user.user_name}</Link>
                 <span>Arrivé(e) le {formatDate(user.user_registration)}</span>

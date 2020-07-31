@@ -8,7 +8,7 @@ function Post({post}) {
     return (
         <div className="post">
             <div className="post-header">
-                <img src="/default_pp.png" alt=""/>
+                <img src={`/${post.user_avatar}`} alt=""/>
                 <div className="post-infos">
                     <div className="post-subtitle">
                         Par <strong><Link to={`/user/${post.post_user}`}>{post.user_name}</Link></strong> le {formatDate(new Date(post.post_date))}
@@ -149,7 +149,7 @@ export default function Posts() {
         }
         
         setSearchTimeout(setTimeout(searchPosts, 500));
-
+        // eslint-disable-next-line
     }, [state.search]);
 
     //Page

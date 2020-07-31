@@ -6,5 +6,5 @@ module.exports = {
     port: 8080,
     saltRounds: 14,
     secret_key: "q1+s15d098qsd154q1s03d210qs514za",
-    multer_allowed_files: /png|jpeg|jpg|txt|mp4|gif/
+    multer_allowed_files: /png|jpeg|jpg|mp4|gif/
 }

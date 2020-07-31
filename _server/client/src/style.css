@@ -860,6 +860,13 @@ textarea.edit-comment {
     background-color: rgba(0, 0, 0, 0.144);
 }
 
+.comment-header img {
+    float: left;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
 .comment-content{
     padding: 10px;
 }

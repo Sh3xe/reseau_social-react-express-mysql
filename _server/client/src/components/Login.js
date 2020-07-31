@@ -49,10 +49,6 @@ export default function Login() {
             if(!err) {
                 const user = JSON.parse(res);
                 setUser(user);
-                setState({
-                    ...state,
-                    messages: [{col:"green", content: `Identifié en tant que "${user.user_name}"`}]
-                });
             } else {
                 setState({
                     ...state,

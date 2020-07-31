@@ -9,25 +9,29 @@ import "./style.css";
 
 export const UserContext = React.createContext({
     user: undefined,
-    setUser: () => {}
+    setUser: () => {},
+    refreshUser: () => {}
 });
 
 export default function App() {
 
     const [user, setUser] = React.useState(undefined);
 
-    React.useEffect(() => {
+    const getUser = function() {
         fetch("/api/current_user")
             .then(res => res.json())
             .then(user => setUser(user))
             .catch(() => {
                 setUser(false);
             })
-    }, []);
+    }
+
+    React.useEffect(getUser, []);
 
     const value = {
         user,
-        setUser
+        setUser,
+        refreshUser: getUser
     }
     
     return (

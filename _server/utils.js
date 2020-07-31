@@ -48,12 +48,13 @@ function formatDate(d) {
 	return `${day}/${month}/${year}, ${hours}h${$minutes}`;
 }*/
 
-function validateForm(form, conditions) {
+function validateForm(form, conditions, null_enabled = false) {
 
     let errors = [];
     for(let [key, value] of Object.entries(form)) {
         if(!value) {
-            errors.push(`${key} non définie`);
+            if(!null_enabled)
+                errors.push(`${key} non définie`);
             continue;
         }
 

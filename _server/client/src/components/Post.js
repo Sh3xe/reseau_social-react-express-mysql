@@ -1,7 +1,7 @@
 import React from "react";
 
 import {Link} from "react-router-dom";
-import {formatDate, sendForm, getUrlQuery, escapeAndParse} from "../utils.js";
+import {formatDate, sendForm, getUrlQuery} from "../utils.js";
 import {UserContext} from "../App.js";
 
 import FileSlider from "./FileSlider.js";
@@ -57,6 +57,7 @@ function Comment({comment, refresh}) {
     return (
         <div className="comment">
             <div className="comment-header">
+                <img src={`/${comment.user_avatar}`} alt="" />
                 Par <Link to={`/user/${comment.comment_user}`}>{comment.user_name}</Link> le {formatDate(new Date(comment.comment_date))}
                 { user.user_id === comment.comment_user ?
                     <React.Fragment>
@@ -160,6 +161,7 @@ function Comments({post_id}) {
             );
         }
         setCommentsElement(el);
+        // eslint-disable-next-line
     }, [comments]);
 
     return (
@@ -313,9 +315,7 @@ function VoteForm({post_id}) {
             .catch(() => console.log("can't get the votes"))
     }
 
-    React.useEffect(() => {
-        fetchVoteValues();
-    }, [post_id]);
+    React.useEffect(fetchVoteValues, [post_id]);
 
     //Render
     return (
@@ -333,7 +333,7 @@ function PostContent({post, files}) {
     return (
     <div className="post">
         <div className="post-header">
-            <img src="/default_pp.png" alt=""/>
+            <img src={`/${post.user_avatar}`} alt=""/>
             <div className="post-infos">
                 <h1 className="post-title"> {post.post_title} </h1>
                 <div className="post-subtitle">

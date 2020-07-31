@@ -1,10 +1,36 @@
 "use strict";
 
 const express = require("express");
+const multer = require("multer");
+const fs = require("fs");
 const router = express.Router();
 
 const users = require("../database/users.js");
 const relations = require("../database/relations.js");
+const utils = require("../utils.js");
+
+//Multer init for files upload
+const storage = multer.diskStorage({
+    destination: `${__dirname}/../uploads`,
+    filename: function(req, file, callback) {
+        let extension = file.originalname.split(".");
+        extension = extension[extension.length - 1];
+        callback(null, `useravatar-${Date.now()}-${utils.generateToken(8)}.${extension}`);
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits:{fileSize: 1000000},
+    fileFilter: function(req, file, callback) {
+        const extname = /png|jpg|jpeg|gif/.test(file.originalname.toLowerCase());
+        const mimetype = /png|jpg|jpeg|gif/.test(file.mimetype);
+        if(extname && mimetype) callback(null, true);
+        else {
+            callback("Erreur: le ficher doit faire 1mb MAX et être une image ou une vidéo");
+        }
+    }
+}).single("avatar");
 
 //GET
 router.get("/users", async(req, res) => {
@@ -16,6 +42,7 @@ router.get("/users", async(req, res) => {
     }
 
     const {error, data} = await users.search(search_params);
+
     if(!error) {
         res.json(data);
     } else {
@@ -157,6 +184,60 @@ router.put("/user/:user_id/friends", async(req, res)=> {
         return;
     }
     res.status(403);
+    res.end();
+});
+
+router.put("/dashboard/avatar", async(req, res) => {
+    upload(req, res, async(err) => {
+        if(!err) {
+            const {error} = await users.update(req.user.user_id, {
+                avatar: req.file.filename
+            });
+
+            if(!error) {
+                fs.unlinkSync(`${__dirname}/../uploads/${req.user.user_avatar}`);
+                res.end();
+                return;
+            } else {
+                res.status(500);
+                res.end();
+            }
+        }
+
+        res.status(400);
+        res.end();
+    });
+});
+
+//PATCH
+router.patch("/dashboard", async(req, res) => {
+    //get and validate form
+	const {username, bio} = req.body;
+
+	const errors = utils.validateForm({
+		username,
+		bio
+	}, {
+		username: {max:100},
+		bio: {max: 1317}
+	}, true);
+
+	if(errors.length) {
+        res.status(400);
+		res.json({errors});
+		return;
+    }
+    
+    //Modification utilisateur
+    const {error} = await users.update(req.user.user_id, {name: username, bio});
+    console.log(error)
+    if(!error) {
+        res.status(200);
+        res.end();
+        return;
+    }
+
+    res.status(500);
     res.end();
 });
 
