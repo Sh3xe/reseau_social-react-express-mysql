@@ -37,7 +37,10 @@ function PublicSettings() {
     const [messages, setMessages] = React.useState([]);
     const [state, setState] = React.useState({
         username: user.user_name || "",
-        bio: user.user_bio || ""
+        bio: user.user_bio || "",
+        col1: user.col1,
+        grd1: user.grd1,
+        grd2: user.grd2
     });
 
     //Functions
@@ -126,12 +129,63 @@ function PublicSettings() {
         }
     }
 
+    const handleColorUpdate = function(e) {
+        e.preventDefault();
+        
+        const params = {
+            method: "PATCH",
+            url: "/api/dashboard",
+            type: "json"
+        }
+
+        const colors = {
+            col1: state.col1,
+            grd1: state.grd1,
+            grd2: state.grd2
+        }
+
+        sendForm(params, {colors}, (err) => { // ajouter les reponses
+            if(!err) {
+                refreshUser();
+                setMessages([{
+                    content: "Couleurs modifiées!",
+                    col: "green"
+                }]);
+            } 
+            else {
+                setMessages([{
+                    content: "Impossible de mettre à jour les couleurs",
+                    col: "red"
+                }]);
+            }
+        });
+    }
+
+    const handleColorChange = function(e) {
+        const value = e.target.value;
+
+        switch(e.target.name) {
+            case "col1":
+                setState({...state, col1: value});
+                break;
+            case "grd1":
+                setState({...state, grd1: value});
+                break;
+            case "grd2":
+                setState({...state, grd2: value});
+                break;
+            default: break;
+        }
+    }
+
     //render
     return (
         <React.Fragment>
             <Message messages={messages}/>
             <header className="login-head"> Paramètres Publics de <Link to={`/user/${user.user_id}`}>{user.user_name}</Link></header>
             <form className="login-form">
+                <h3>Informations</h3>
+                <hr/>
                 <div>
                     <label htmlFor="username">Nom d'utilisateur <span className="char-counter">{`${state.username.length}/100`}</span></label>
                     <button className="confirmation-button"
@@ -163,6 +217,39 @@ function PublicSettings() {
                     <input type="file" name="avatar"
                         ref={file_input_ref}
                     ></input>
+
+                <h3>Couleurs du profil</h3>
+                <hr />
+                <button className="confirmation-button extended" onClick={handleColorUpdate}>Mettre à jour</button>
+                <div className="color-container">
+                    <input type="color" name="col1" 
+                        value={state.col1}
+                        onChange={handleColorChange}
+                    />
+                    <input type="color" name="grd1"
+                        value={state.grd1}
+                        onChange={handleColorChange}
+                    />
+                    <input type="color" name="grd2"
+                        value={state.grd2}
+                        onChange={handleColorChange}
+                    />
+                </div> 
+                <div className="mini-profile" style={{background: `linear-gradient(${state.grd1}88, ${state.grd2}88)`}}>
+                    <header className="mini-profile-header" style={{background: state.col1}}>
+                        <img src="/default-avatar.png" alt=""/>
+                        <span>Nom</span>
+                    </header>
+                    <main className="mini-profile-main">
+                        <div className="mini-profile-prt1">
+                            <div className="mini-profile-rect" style={{borderTopColor: state.col1}}></div>
+                            <div className="mini-profile-rect" style={{borderTopColor: state.col1}}></div>
+                        </div>
+                        <div className="mini-profile-posts">
+                            <div className="mini-profile-rect" style={{borderTopColor: state.col1}}></div>
+                        </div>
+                    </main>
+                </div>
             </form>
         </React.Fragment>
     );

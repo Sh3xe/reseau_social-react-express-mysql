@@ -1,12 +1,14 @@
 "use strict";
 
 function parseKeyValueString(str) {
-    let obj = {};
-    str.split(";").forEach((e) => {
-        const [key, value] = e.split("=");
-        obj[key] = value;
-    });
-    return obj;
+    try {
+        let obj = {};
+        str.split(";").forEach((e) => {
+            const [key, value] = e.split("=");
+            obj[key] = value;
+        });
+        return obj;
+    } catch(e) {return false};
 }
 
 function objectToKeyValue(object) {

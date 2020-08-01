@@ -3,7 +3,7 @@
 const db = require("./DatabaseManager.js");
 const bcrypt = require("bcryptjs");
 
-const {generateToken} = require("../utils.js");
+const {generateToken, objectToKeyValue} = require("../utils.js");
 const config = require("../../config.js");
 
 async function search({search_query, start, step}) {
@@ -35,7 +35,8 @@ async function getByToken(user_token) {
             user_name, user_email,
             user_bio, user_token,
             user_status, user_registration,
-            user_id, user_avatar
+            user_id, user_avatar,
+            user_colors
         FROM rs_users
         WHERE user_token = ?`;
 
@@ -49,7 +50,8 @@ async function getById(user_id) {
             user_name, user_email,
             user_bio, user_token,
             user_status, user_registration,
-            user_id, user_avatar
+            user_id, user_avatar,
+            user_colors
         FROM rs_users
         WHERE user_id = ?`;
 
@@ -105,10 +107,16 @@ async function add(name, email, password) {
     return await db.exec(query, [email, hashed_password, name, token ]);
 }
 
-async function update(user_id, {name, email, password, bio, status, avatar}) {
-
+async function update(user_id, {name, email, password, bio, status, avatar, colors}) {
     let fields = "";
     let params = [];
+
+    if(colors) {
+        fields += " user_colors = ?,";
+
+        const parsed_colors = objectToKeyValue(colors);
+        params.push(parsed_colors);
+    }
 
     if(name) {
         fields += " user_name = ?,";

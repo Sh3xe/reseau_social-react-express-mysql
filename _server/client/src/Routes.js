@@ -12,7 +12,6 @@ import User from "./components/User.js";
 import Friends from "./components/Friends.js";
 import Upload from "./components/Upload.js";
 import Edit from "./components/Edit.js";
-import Logout from "./components/Logout.js";
 import Dashboard from "./components/Dashboard.js";
 
 function MyAccountRedirection() {
@@ -65,8 +64,6 @@ export default function Routes() {
                 <Route path="/me-redirection" exact component={MyAccountRedirection} />
 
                 <Route path="/posts" exact component={Posts} />
-                <Route path="/logout" exact component={Logout} />
-
                 <Route path="/upload" exact component={Upload} />
                 <Route path="/user/:user_id" exact component={User} />
                 <Route path="/post/:post_id" exact component={Post} />

@@ -1,10 +1,12 @@
 import React from  "react";
 
 function Page({files, selected}) {
+    //get the file obj and the filetype form the mimetype
     const file = files[selected];
     const type = file.file_mime.split("/")[0];
-    let content = null;
+    let content = undefined;
 
+    //get the right element depending on the filetype
     switch(type) {
         case "image":
             content = <img 
@@ -14,8 +16,7 @@ function Page({files, selected}) {
             ></img>
             break;
         case "video":
-            content = "";
-            content = <video controls>
+            content = <video className="slider-content" controls>
                 <source src={`/${file.file_name}`} type={file.file_mime}></source>
             </video>;
             break;
@@ -30,17 +31,14 @@ function Page({files, selected}) {
 }
 
 function PageSelector({changePage, selected, length}) {
-
     const radio_el = [];
 
     const prev = function() {
-        if(selected > 0)
-            changePage(-1);
+        changePage(-1);
     }
 
     const next = function() {
-        if(selected < length - 1)
-            changePage(+1);
+        changePage(+1);
     }
 
     for(let i = 0; i < length; i++) {
@@ -51,9 +49,13 @@ function PageSelector({changePage, selected, length}) {
 
     return (
         <div className="slider-controller">
-            <button onClick={prev}>&lt;-</button>
-            {radio_el}
-            <button onClick={next}>-&gt;</button>
+            {length !== 1 ? 
+            <React.Fragment>
+                <button onClick={prev}>&lt;</button>
+                {radio_el}
+                <button onClick={next}>&gt;</button>
+            </React.Fragment> : ""
+            }
         </div>
     );
 }
@@ -64,7 +66,13 @@ export default function FileSlider({files}) {
 
     //Functions
     const handlePageChange = function(value) {
-        setSelected(selected + value);
+        if(selected + value < 0) {
+            setSelected(files.length - 1)
+        } else if(selected + value > files.length - 1) {
+            setSelected(0)
+        } else {
+            setSelected(selected + value);
+        }
     }
 
     //Render

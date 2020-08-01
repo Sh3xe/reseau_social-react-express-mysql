@@ -13,7 +13,7 @@ function Comment({comment, refresh}) {
 
     const [state, setState] = React.useState({
         editing: false,
-        comment_content: comment.comment_content
+        comment_content: ""
     });
 
     //Functions
@@ -24,7 +24,10 @@ function Comment({comment, refresh}) {
     }
 
     const toggleEditState = function() {
-        if(state.editing) {
+        // If we toggle from "editing" to normal, we update the comment
+        // We don't update anything if the comment_content and the 
+        // modified version is the same
+        if(state.editing && comment.comment_content !== state.comment_content) {
             const params = {
                 url: `/api/post/${comment.comment_post}/comment/${comment.comment_id}`,
                 method: "PATCH",
@@ -35,9 +38,15 @@ function Comment({comment, refresh}) {
                 if(!err) refresh();
             });
         }
-        setState({...state, editing: !state.editing});
+
+        setState({
+            ...state,
+            comment_content: comment.comment_content,
+            editing: !state.editing
+        });
     }
 
+    //Used to switch from "editing" state to normal without updating the comment
     const cancelEdit = function() {
         setState({
             ...state,
@@ -62,7 +71,9 @@ function Comment({comment, refresh}) {
                 { user.user_id === comment.comment_user ?
                     <React.Fragment>
                         <button className="confirmation-button" onClick={deleteComment}>Supprimer</button>
-                        {state.editing ? <button className="confirmation-button" onClick={cancelEdit}>Annuler</button> : ""}
+                        { state.editing ? 
+                            <button className="confirmation-button" onClick={cancelEdit}>Annuler</button> : ""
+                        }
                         <button className="confirmation-button" onClick={toggleEditState}>
                             { state.editing ? "Enregister" : "Modifier"}
                         </button> { state.editing ? `${state.comment_content.length}/250` : ""}
@@ -91,7 +102,6 @@ function Comments({post_id}) {
     });
 
     const [comments, setComments] = React.useState([]);
-    const [comments_el, setCommentsElement] = React.useState([]);
 
     //Functions
     const handleFormChange = function(e) {
@@ -117,6 +127,7 @@ function Comments({post_id}) {
         sendForm(params, form_body, (err) => {
             if(!err) {
                 getComments();
+                setState({...state, comment_content: ""});
             } else console.log("problème");
         });
     }
@@ -153,16 +164,12 @@ function Comments({post_id}) {
 
     React.useEffect(getComments, [post_id, state.start]);
 
-    React.useEffect(() => {
-        let el = [];
-        for(let i = 0; i < comments.length; i++) {
-            el.push(
-                <Comment key={i} comment={comments[i]} refresh={getComments}/>
-            );
-        }
-        setCommentsElement(el);
-        // eslint-disable-next-line
-    }, [comments]);
+    let comments_el = [];
+    for(let i = 0; i < comments.length; i++) {
+        comments_el.push(
+            <Comment key={i} comment={comments[i]} refresh={getComments}/>
+        );
+    }
 
     return (
         <React.Fragment>
@@ -236,22 +243,18 @@ function AsideController({curr_user, post_user, post_id, history}) {
     const handleRemove = function() {
         fetch(`/api/post/${post_id}`, {method:"DELETE"})
             .then( res => {
-                if(res.ok) {
-                    history.push("/posts");
-                } else {
-                    console.log("problème")
-                }
-            })
+                if(res.ok) history.push("/posts");
+            });
     }
 
     return (
         <React.Fragment>
-        <button className="button norm" onClick={showMessage}>Signaler</button>
         { curr_user.user_id === post_user ?
             <React.Fragment>
             <Link to={`/post/${post_id}/edit`}><button className="button norm" >Modifier</button></Link>
             <button className="button norm" onClick={showMessage}>Supprimer</button>
-            </React.Fragment> : ""
+            </React.Fragment> : 
+            <button className="button norm" onClick={showMessage}>Signaler</button>
         }
         
         { state.message === "delete" ? 
@@ -283,6 +286,7 @@ function VoteForm({post_id}) {
     //Hooks
     const [votes, setVotes] = React.useState(0);
 
+    //the "sendForm" function takes this object as parameter
     const form_params = {
         method: "PUT",
         url: `/api/post/${post_id}/votes`,
@@ -337,7 +341,8 @@ function PostContent({post, files}) {
             <div className="post-infos">
                 <h1 className="post-title"> {post.post_title} </h1>
                 <div className="post-subtitle">
-                    Par <strong><Link to={`/user/${post.post_user}`}>{post.user_name}</Link></strong> le {formatDate(new Date(post.post_date))}
+                    Par <strong><Link to={`/user/${post.post_user}`}>{post.user_name}</Link></strong>
+                    le {formatDate(new Date(post.post_date))}
                     {post.post_date !== post.post_edit_date ? `, modifié le ${formatDate(post.post_edit_date)}` : ""} 
                     , {post.post_views} vue(s)
                 </div>
@@ -345,7 +350,10 @@ function PostContent({post, files}) {
             <VoteForm post_id={post.post_id}/>
         </div>
         <FileSlider className="" files={files}/>
-        <div className="post-content"> {post.post_content} </div>
+        <div className="post-content"> 
+        {files.length ? <hr /> : ""}
+        {post.post_content} 
+        </div>
     </div>);
 }
 
@@ -360,11 +368,13 @@ export default function Post(props) {
 
     //Functions
     React.useEffect(() => {
+        //fetch the post data
         fetch(`/api/post/${post_id}`)
             .then(res => res.json())
             .then(post => setPost(post))
             .catch(() => setMessages([{content: "Impossible de trouver ce post", col:"red"}]))
 
+        //fetch the post's files (for the FileSlider)
         fetch(`/api/post/${post_id}/files`)
             .then(res => res.json())
             .then(files => setFiles(files))

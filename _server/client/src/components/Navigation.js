@@ -4,8 +4,16 @@ import {Link} from "react-router-dom";
 import {UserContext} from "../App.js";
 
 export default function() {
+    const {user, setUser} = React.useContext(UserContext);
 
-    const {user} = React.useContext(UserContext);
+    const handleLogout = function(e) {
+        e.preventDefault();
+        
+        fetch("/api/logout")
+            .then(() => {
+                setUser(false);
+            });
+    }
 
     return (
         <header className="site-header">
@@ -34,7 +42,7 @@ export default function() {
                             <li><Link to={`/user/${user.user_id}`}>Profil</Link></li>
                             <li><Link to="/friends">Amis</Link></li>
                             <li><Link to="/dashboard">Paramètres</Link></li>
-                            <li><Link to="/logout">Se deconnecter</Link></li>
+                            <li><a href="/" onClick={handleLogout}>Se deconnecter</a></li>
                         </ul>
                     </li>
                 </ul>

@@ -20,7 +20,7 @@ export default function Login() {
 
     const handleSubmit = function(e) {
         e.preventDefault();
-        
+
         const form_data = {
             password: state.password,
             email: state.email

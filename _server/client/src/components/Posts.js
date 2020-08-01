@@ -50,38 +50,38 @@ function CategorySelector({category, changeCategory}) {
     );
 }
 
-function PostsContainer({start, posts, onPageChange}) {
-    //Hooks
-    const [post_el, setPostEl] = React.useState([]);
+function PostsContainer({start, posts, changePage}) {
+    //Vars
+    const step = 14;
 
     //Functions
     const pagePlus = function() {
-        if(posts.length > 14)
-            onPageChange(1);
+        if(posts.length > step)
+            changePage(1);
     }
 
     const pageMinus = function() {
-        if(start >= 14) 
-            onPageChange(-1);
+        if(start >= step) 
+            changePage(-1);
     }
 
-    React.useEffect(() => {
-        let new_post_el = [];
-        posts.forEach(post => {
-            new_post_el.push(<Post key={new_post_el.length} post={post} />);
-        });
-        if(new_post_el.length === 15) new_post_el.pop();
+    //Render
+    let post_el = [];
 
-        setPostEl(new_post_el);
-    }, [posts]);
+    posts.forEach(post => {
+        post_el.push(<Post key={post_el.length} post={post} />);
+    });
 
+    // We get 1 more element to know if there is another page
+    // but we don't want to display this element
+    if(post_el.length === step + 1) post_el.pop();
 
     return (
        <React.Fragment>
         <div className="posts-feed">
             {post_el}
         </div>
-        { posts.length > 14 || start >=14 ?
+        { posts.length > 14 || start >=14 ? // If there is another page or if we are not in the first page we display the "next" and "prev"
             <div className="page-controller">
                 <button className="button norm" onClick={pageMinus}>Page précédente</button>
                 <button className="button norm" onClick={pagePlus}>Page suivante</button>
@@ -96,8 +96,10 @@ export default function Posts() {
     const [state, setState] = React.useState({
         category: "Tout",
         search: "",
-        start: 0
+        start: 0,
     });
+
+    const step = 14;
 
     const [posts, setPosts] = React.useState([]);
     const [search_timeout, setSearchTimeout] = React.useState(null);
@@ -105,8 +107,8 @@ export default function Posts() {
 
     //Functions
     const handleSearchChange = function(e) {
+        //handle the search query change
         const value = e.target.value;
-
         setState({
             ...state,
             search: value
@@ -119,9 +121,9 @@ export default function Posts() {
 
     const handlePageChange = function(value) {
         if(value === -1) {
-            setState({ ...state, start: state.start - 14 });
+            setState({ ...state, start: state.start - step });
         } else if(value === 1) {
-            setState({ ...state, start: state.start + 14 });
+            setState({ ...state, start: state.start + step });
         }
     }
     
@@ -129,7 +131,7 @@ export default function Posts() {
         const url_query = getUrlQuery({
             start: state.start,
             search: state.search,
-            step: 15,
+            step: step + 1,
             category: state.category
         }); // returns a "?key1=value1&key2=val2"
 
@@ -147,7 +149,6 @@ export default function Posts() {
         if(search_timeout) {
             clearTimeout(search_timeout);
         }
-        
         setSearchTimeout(setTimeout(searchPosts, 500));
         // eslint-disable-next-line
     }, [state.search]);
@@ -166,7 +167,7 @@ export default function Posts() {
                 />
             </form>
             <Message messages={messages}/>
-            <PostsContainer start={state.start} posts={posts} onPageChange={handlePageChange}/>
+            <PostsContainer start={state.start} posts={posts} changePage={handlePageChange}/>
         </div>
         </React.Fragment>
     );

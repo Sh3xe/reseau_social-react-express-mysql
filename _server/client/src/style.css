@@ -19,7 +19,7 @@ hr{
     height: 2px;
     border: 0;
     background-color: grey;
-    margin: 1em 0;
+    margin: 0.5em 0;
 }
 
 textarea{
@@ -31,6 +31,22 @@ textarea{
 
 h1>a {
     text-decoration: none;
+}
+
+input[type=color] {
+	padding: 5px;
+	margin: 0;
+	border: 1px solid grey;
+    border-radius: 4px;
+	background: white;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+}
+
+input[type=color]:hover {
+    background: rgb(223, 223, 223);
+    transition: .3s;
 }
 
 /*HEADER*/
@@ -170,6 +186,12 @@ ul.dropdown-content a{
 
 .login-form {
     width: 100%;
+    box-shadow: lightgray 2px 2px 2px 0;
+}
+
+.login-form h3 {
+    margin: 0;
+    margin-top: 2em;
 }
 
 .login-form div{
@@ -455,6 +477,7 @@ ul.dropdown-content a{
 .vote-value {
     text-align: center;
     line-height: 40px;
+    cursor: pointer;
 }
 
 .vote-value.up{
@@ -470,10 +493,12 @@ ul.dropdown-content a{
     background-color: white;
     border: 0;
     border-radius: 3px;
+    border: 1px solid white;
 }
 
 .vote-up {
     color: green;
+    cursor: pointer;
     margin-bottom: 3px;
 }
 
@@ -482,6 +507,7 @@ ul.dropdown-content a{
 }
 
 .vote-down {
+    cursor: pointer;
     color: red;
 }
 
@@ -505,6 +531,12 @@ ul.dropdown-content a{
 .confirmation-button:hover {
     background-color: rgb(204, 204, 204);
     transition: .3s;
+}
+
+.confirmation-button.extended {
+    display: block;
+    width: 400px;
+    margin: 0 auto;
 }
 
 .input.t1{
@@ -546,6 +578,7 @@ ul.dropdown-content a{
     text-align: center;
     border: 1px solid grey;
     border-radius: 4px 4px 0 0;
+    box-shadow: lightgray 2px 2px 2px 0;
 }
 
 .form-container {
@@ -603,6 +636,60 @@ button.toggle-password{
     width: 80%;
 }
 
+/*PROFIL*/
+
+div.color-container {
+    display: flex;
+    justify-content: space-around;
+    width: 400px;
+    margin: 1em auto;
+}
+
+div.color-container input {
+    width: 40px;
+    height: 40px;
+}
+
+div.mini-profile {
+    background: white;
+    width: 400px;
+    margin: 1em auto;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.mini-profile-header {
+    padding: 5px;
+    color: white;
+    background: black;
+    height: 60px;
+}
+
+.mini-profile-header img{
+    float: left;
+    margin-right: 5px;
+    width: 30px;
+    height: 30px;
+}
+
+div.mini-profile-rect {
+    height: 100px;
+    border: 1px solid grey;
+    border-top: 20px solid black;
+    border-radius: 3px;
+    width: 100%;
+    margin: 5px;
+}
+
+.mini-profile-prt1 {
+    display: flex;
+    justify-content: space-around;
+}
+
+.mini-profile-posts {
+    display: flex;
+    justify-content: space-around;
+}
 
 .profil-container{
     width: 100%;
@@ -644,6 +731,7 @@ button.toggle-password{
     overflow: hidden;
     border-radius: 4px;
 }
+
 .user-card,
 .friend-card {
     display: flex;
@@ -661,11 +749,12 @@ button.toggle-password{
 .friendcard-infos * {
     display: block;
 }
+
 .user-card img,
 .friend-card img{
-    margin-right: 1em;
-    width: 50px;
-    height: 50px;
+    margin: 10px 10px 10px 0;
+    width: 40px;
+    height: 40px;
 }
 
 .friend-card button{
@@ -804,12 +893,15 @@ button.toggle-password{
 .slider-content {
     max-width: 100%;
     max-height: 400px;
+    margin: 0 auto;
 }
 
 .slider {
     width: 100%;
-    max-height: 400px;
-    overflow-y: scroll;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .slider video{
@@ -819,6 +911,22 @@ button.toggle-password{
 .slider-controller {
     display: flex;
     justify-content: space-between;
+    padding: 5px;
+}
+
+.slider-controller button{
+    cursor: pointer;
+    color: rgb(0, 0, 0);
+    background-color: rgb(228, 228, 228);
+    border: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+}
+
+.slider-controller button:hover{
+    background-color: grey;
+    transition: .3s;
 }
 
 .post-buttons button{
@@ -971,5 +1079,22 @@ textarea.edit-comment {
     .site-header ul li{
         float: left;
         width: auto;
+    }
+
+    .part1 {
+        display: block;
+    }
+
+    .user-bio,
+    .user-friends {
+        margin: 1em 0;
+        width: 100%;
+        height: 200px;
+    }
+
+    div.mini-profile,
+    div.color-container,
+    .confirmation-button.extended {
+        width: 100%;
     }
 }

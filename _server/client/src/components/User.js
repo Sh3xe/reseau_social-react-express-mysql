@@ -43,42 +43,60 @@ function UserPosts({posts}) {
     );
 }
 
-function UserContent({user_id}) {
+function UserContent({user_id, color}) {
     //Hooks
+
     const [posts, setPosts] = React.useState([]);
     const [messages, setMessages] = React.useState([]);
-    const [state, /*setState*/] = React.useState({
-        start: 0,
-    });
+    const [state, setState] = React.useState({start: 0});
 
-    React.useEffect(() => {
+    const step = 8;
 
+    //Functions
+
+    const prevPage = function() {
+        if(state.start >= step)
+            setState({...state, start: state.start - step});
+    }
+
+    const nextPage = function() {
+        if(posts.length >= step)
+            setState({...state, start: state.start + step});
+    }
+
+    const getPosts = function() {
         const query_params = getUrlQuery({
             start: state.start,
-            step: 8
-        });
+            step: step
+        }); //returns a &key=value&key=val...
 
         fetch(`/api/user/${user_id}/posts?${query_params}`)
             .then(res => res.json())
-            .then(posts => setPosts(posts))
-            .catch(() => {
+            .then(posts => {
+                setPosts(posts);
+                setMessages([]);
+            }).catch(() => {
                 setMessages([{content:"Impossible de récuperer les posts", col:"red"}]);
-            })
-    }, [user_id, state.start]);
+            });
+    }
+
+    React.useEffect(getPosts, [state.start]);
 
     return (
         <div className="user-posts">
-            <div className="userpost-head">
+            <div className="userpost-head" style={{background: color}}>
                 Posts de Username
             </div>
             <div className="userpost-content">
                 <Message messages={messages} />
                 <UserPosts posts={posts} />
             </div>
+            { state.start >= step || posts.length >= step ?
             <div className="page-controller">
-                <button className="button norm">Page Précédente</button>
-                <button className="button norm">Page suivante</button>
-            </div>
+                <button className="button norm" onClick={prevPage}>Page Précédente</button>
+                <button className="button norm" onClick={nextPage}>Page suivante</button>
+            </div> : ""
+            }
         </div>
     );
 }
@@ -93,7 +111,7 @@ function Friend({user}) {
     );
 }
 
-function Friends({friends}) {
+function Friends({friends, color}) {
     let friends_el = [];
 
     for(let i = 0; i < friends.length; i++) {
@@ -106,7 +124,7 @@ function Friends({friends}) {
 
     return (
         <div className="user-friends">
-            <div className="userfriend-head"> Friends </div>
+            <div className="userfriend-head" style={{background: color}}> Friends </div>
             <div className="userfriend-content">
                 {friends_el}
             </div>
@@ -114,10 +132,10 @@ function Friends({friends}) {
     );
 }
 
-function Bio({bio}) {
+function Bio({bio, color}) {
     return (
         <div className="user-bio">
-            <div className="userbio-head">Bio</div>
+            <div className="userbio-head" style={{background: color}}>Bio</div>
             <div className="userbio-content">{bio}</div>
         </div>
     );
@@ -160,6 +178,7 @@ function FriendButton({user_id}) {
     }
 
     const getRelation = function() {
+        // eslint-disable-next-line
         if(user_id != user.user_id) {
             fetch(`/api/user/${user_id}/relation`)
                 .then(res => res.json())
@@ -171,12 +190,13 @@ function FriendButton({user_id}) {
     React.useEffect(getRelation, [user_id, user]);
 
     React.useEffect(() => {
-        if(relation == undefined || user_id == user.user_id) {
+        // eslint-disable-next-line
+        if(relation === undefined || user_id == user.user_id) {
             setElement(<div></div>);
             return;
         };
 
-        if(relation == false) {
+        if(relation === false) {
             setElement(
                 <div>
                     <button className="button col1" onClick={addFriend}>Ajouter en amis</button>
@@ -185,7 +205,7 @@ function FriendButton({user_id}) {
             return;
         }
 
-        if(relation.relation_status == "friends") {
+        if(relation.relation_status === "friends") {
             setElement(
                 <div>
                     <button className="button col1">Parler</button>&nbsp;&nbsp;
@@ -195,7 +215,7 @@ function FriendButton({user_id}) {
             return;
         }
 
-        if(relation.relation_status == "pending") {
+        if(relation.relation_status === "pending") {
             setElement(
                 <div>
                     <button className="button col1">Requête en attente</button>
@@ -203,8 +223,9 @@ function FriendButton({user_id}) {
             );
             return;
         }
+    // eslint-disable-next-line
     }, [relation, user_id, user]);
-
+    
     return (
         <React.Fragment>
             {element}
@@ -231,18 +252,18 @@ export default function User() {
 
     //Render
     return (
-        <div className="profil-container">
-            <div className="profil-head">
+        <div className="profil-container" style={{background: `linear-gradient(${user.grd1}88, ${user.grd2}88)`}}>
+            <div className="profil-head" style={{background: user.col1}}>
                 <img src={`/${user.user_avatar}`} alt=""/>
                 <h1>{user.user_name}</h1>
                 <FriendButton user_id={user_id}/>
             </div>
             <div className="profil-content">
                 <div className="part1">
-                    <Bio bio={user.user_bio}/>
-                    <Friends friends={friends}/>
+                    <Bio bio={user.user_bio} color={user.col1}/>
+                    <Friends friends={friends} color={user.col1}/>
                 </div>
-                <UserContent user_id={user_id}/>
+                <UserContent user_id={user_id} color={user.col1}/>
             </div>
         </div>
     );

@@ -56,7 +56,12 @@ router.get("/current_user", async(req, res) => {
     const {data, error} = await users.getByToken(req.session.user_token);
 
     if(!error) {
-        res.json(data);
+        const colors = utils.parseKeyValueString(data.user_colors);
+        
+        res.json({
+            ...data,
+            ...colors
+        });
     } else {
         res.status(400);
         res.end();
@@ -84,7 +89,12 @@ router.get("/user/:id", async(req, res) => {
     const {data, error} = await users.getById(req.params.id);
 
     if(!error) {
-        res.json(data);
+        const colors = utils.parseKeyValueString(data.user_colors);
+
+        res.json({
+            ...data,
+            ...colors
+        });
     } else {
         res.status(400);
         res.end();
@@ -212,7 +222,14 @@ router.put("/dashboard/avatar", async(req, res) => {
 //PATCH
 router.patch("/dashboard", async(req, res) => {
     //get and validate form
-	const {username, bio} = req.body;
+    const {username, bio} = req.body;
+
+    let colors = undefined;
+    if(req.body.colors) {
+        const {col1, grd1, grd2} = req.body.colors;
+        if(col1 && grd1 && grd2)
+            colors = {col1, grd1, grd2};
+    }
 
 	const errors = utils.validateForm({
 		username,
@@ -229,8 +246,8 @@ router.patch("/dashboard", async(req, res) => {
     }
     
     //Modification utilisateur
-    const {error} = await users.update(req.user.user_id, {name: username, bio});
-    console.log(error)
+    const {error} = await users.update(req.user.user_id, {name: username, bio, colors});
+    
     if(!error) {
         res.status(200);
         res.end();

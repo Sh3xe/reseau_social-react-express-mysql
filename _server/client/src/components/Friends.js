@@ -111,8 +111,6 @@ function RequestList() {
     //Hooks
     const [requests, setRequests] = React.useState([]);
     const {user} = React.useContext(UserContext);
-    
-    const [friends_el, setFriendsEl] = React.useState([]);
 
     //Functions
     const getRequests = function() {
@@ -123,18 +121,15 @@ function RequestList() {
 
     React.useEffect(getRequests, [user]);
     
-    React.useEffect(() => {
-        let new_friends_el = [];
-        for(let i = 0; i < requests.length; i++) {
-            new_friends_el.push(
-                <RequestCard key={i} request={requests[i]} refresh={getRequests}/>
-            );
-        }
-        if(!new_friends_el.length) new_friends_el = "Vous n'avez pas de requêtes.";
+    let friends_el = [];
 
-        setFriendsEl(new_friends_el);
+    for(let i = 0; i < requests.length; i++) {
+        friends_el.push(
+            <RequestCard key={i} request={requests[i]} refresh={getRequests}/>
+        );
+    }
 
-    }, [requests])
+    if(!friends_el.length) friends_el = "Vous n'avez pas de requêtes.";
 
     //Render
     return (
@@ -226,6 +221,7 @@ function FriendSearch() {
         }
 
         setSearchTimeout(setTimeout(searchUsers, 500));
+    // eslint-disable-next-line
     }, [state.search])
 
     //Render
@@ -250,28 +246,20 @@ function FriendSearch() {
 
 //MAIN
 function FriendMenu({changeSection}) {
-    //Hooks
-    const [selected, setSelected] = React.useState("friends");
-
-    //Functions
-    React.useEffect(() => {
-        changeSection(selected);
-    }, [selected]);
-
     //Render
     return(
         <div className="friend-menu">
             <span 
-                className="friend-link"
-                onClick={() => setSelected("friends")}
+                className="friend-link" 
+                onClick={() => changeSection("friends")}
             >Amis</span>
             <span 
                 className="friend-link"
-                onClick={() => setSelected("requests")}
+                onClick={() => changeSection("requests")}
             >Requêtes</span>
             <span 
                 className="friend-link"
-                onClick={() => setSelected("search")}
+                onClick={() => changeSection("search")}
             >Rechercher</span>
         </div>
     );

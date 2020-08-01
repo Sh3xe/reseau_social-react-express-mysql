@@ -16,17 +16,18 @@ const io = socketio(server);
 
 app.use(sessions({ // cookie init
     cookieName: "session",
-    sameSite: "Strict",
     secret: config.secret_key,
     duration: 30 * 60 * 1000,
-    ephemeral: true
+    cookie: {
+        ephemeral: true,
+        sameSite: "Strict"
+    }
 }));
 
 // middlewares
 const custom_middlewares = require("./middlewares.js");
 
 app.use(custom_middlewares.logRequests);
-
 app.use(express.static(path.join( __dirname, "/client/build" )));
 app.use(express.static(path.join( __dirname, "/uploads" )));
 app.use(express.json());

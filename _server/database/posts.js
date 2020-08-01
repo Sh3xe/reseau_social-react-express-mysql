@@ -52,6 +52,7 @@ async function search({search, category, start, step}) {
             ${category_command || ""}
             ${ (category_command && search_command) ? "AND" : "" }
             ${ search_command ? `(${search_command})` : "" }
+            ORDER BY post_date DESC
             LIMIT ?, ?`;
 
         //We add the start / step at the end
@@ -61,6 +62,7 @@ async function search({search, category, start, step}) {
     } else {
         const query = `
             SELECT * FROM rs_posts
+            ORDER BY post_date DESC
             LIMIT ?, ?`;
         
         return await db.exec(query, [start, step]);
