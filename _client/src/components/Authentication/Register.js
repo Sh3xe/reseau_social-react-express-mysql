@@ -1,6 +1,6 @@
 import React from "react";
 
-import {validateForm, sendForm} from "../utils.js";
+import {validateForm, sendForm} from "../../utils.js";
 
 import {Link} from "react-router-dom";
 

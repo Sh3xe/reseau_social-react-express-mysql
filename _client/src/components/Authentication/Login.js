@@ -1,9 +1,9 @@
 import React from "react";
 import {Link} from "react-router-dom";
 
-import {validateForm, sendForm} from "../utils.js";
-import {UserContext} from "../App.js";
-import Message from "./Message.js";
+import {validateForm, sendForm} from "../../utils.js";
+import {UserContext} from "../../App.js";
+import Message from "../Utils/Message.js";
 
 export default function Login() {
 

@@ -1,29 +1,120 @@
 import React from "react";
 
-import Message from "./Message.js";
+import Message from "../Utils/Message.js";
 
 import {Link} from "react-router-dom";
-import {UserContext} from "../App.js";
-import {sendForm} from "../utils.js";
+import {UserContext} from "../../App.js";
+import {sendForm} from "../../utils.js";
 
 // Sections
 function PrivateSettings() {
     //Hooks
-    const {user} = React.useContext(UserContext);
+    const [messages, setMessages] = React.useState([]);
+    const {user, refreshUser} = React.useContext(UserContext);
+    const [state, setState] = React.useState({
+        password: "",
+        email: user.user_email
+    });
 
     //Functions
+    const handlePasswordUpdate = function(e) {
+        e.preventDefault();
+        
+        const params = {
+            method: "PATCH",
+            url: "/api/dashboard",
+            type: "json"
+        }
+
+        sendForm(params, {password: state.password}, (err) => { // ajouter les reponses
+            if(!err) {
+                refreshUser();
+                setMessages([{
+                    content: "Mot de passe modifié!",
+                    col: "green"
+                }]);
+            } 
+            else {
+                setMessages([{
+                    content: "Impossible de mettre à jour le mot de passe",
+                    col: "red"
+                }]);
+            }
+        });
+    }
+
+    const handleEmailUpdate = function(e) {
+        e.preventDefault();
+        
+        const params = {
+            method: "PATCH",
+            url: "/api/dashboard",
+            type: "json"
+        }
+
+        sendForm(params, {email: state.email}, (err) => { // ajouter les reponses
+            if(!err) {
+                refreshUser();
+                setMessages([{
+                    content: "E-mail modifié!",
+                    col: "green"
+                }]);
+            } 
+            else {
+                setMessages([{
+                    content: "Impossible de mettre à jour l'E-mail",
+                    col: "red"
+                }]);
+            }
+        });
+    }
+
+    const handleInputChange = function(e) {
+        const value = e.target.value;
+
+        switch(e.target.name) {
+            case "email":
+                if(value.length <= 255)
+                    setState({...state, email: value});
+                break;
+            case "password":
+                if(value.length <= 60)
+                    setState({...state, password: value});
+                break;
+            default: break;
+        }
+    }
 
     //Render
     return (
         <React.Fragment>
+            <Message messages={messages}/>
             <header className="login-head"> Paramètres Privés de <Link to={`/user/${user.user_id}`}>{user.user_name}</Link></header>
             <form className="login-form">
+                <h3>Informations</h3>
+                <hr/>
                 <div>
-                    <label htmlFor="email">E-Mail</label>
-                    <input type="text" name="email"
-                        className="input t1"
-                    ></input>
+                    <label htmlFor="email">E-mail <span className="char-counter">{`${state.email.length}/255`}</span></label>
+                    <button className="confirmation-button"
+                        onClick={handleEmailUpdate}
+                    >Mettre à jour</button>
                 </div>
+                <input type="email" name="email"
+                    className="input t1"
+                    onChange={handleInputChange}
+                    value={state.email}
+                ></input>
+                <div>
+                    <label htmlFor="email">Mot de passe <span className="char-counter">{`${state.password.length}/60`}</span></label>
+                    <button className="confirmation-button"
+                        onClick={handlePasswordUpdate}
+                    >Mettre à jour</button>
+                </div>
+                <input type="text" name="password"
+                    className="input t1"
+                    onChange={handleInputChange}
+                    value={state.password}
+                ></input>
             </form>
         </React.Fragment>
     );
@@ -113,7 +204,7 @@ function PublicSettings() {
         });
     }
 
-    const handleInputUpdate = function(e) {
+    const handleInputChange = function(e) {
         const value = e.target.value;
 
         switch(e.target.name) {
@@ -194,7 +285,7 @@ function PublicSettings() {
                 </div>
                     <input type="text" name="username"
                         className="input t1"
-                        onChange={handleInputUpdate}
+                        onChange={handleInputChange}
                         value={state.username}
                     ></input>
                 <div>
@@ -205,7 +296,7 @@ function PublicSettings() {
                 </div>
                     <textarea type="text" name="userbio"
                         className="input t1"
-                        onChange={handleInputUpdate}
+                        onChange={handleInputChange}
                         value={state.bio}
                     ></textarea>
                 <div>
@@ -217,7 +308,6 @@ function PublicSettings() {
                     <input type="file" name="avatar"
                         ref={file_input_ref}
                     ></input>
-
                 <h3>Couleurs du profil</h3>
                 <hr />
                 <button className="confirmation-button extended" onClick={handleColorUpdate}>Mettre à jour</button>

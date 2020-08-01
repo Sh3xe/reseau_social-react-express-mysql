@@ -1,25 +1,30 @@
 import {Route, Link, Redirect} from "react-router-dom";
 import React from 'react';
-
 import {UserContext} from "./App.js";
 
 import Home from "./components/Home.js";
-import Post from "./components/Post.js";
-import Posts from "./components/Posts.js";
-import Register from "./components/Register.js";
-import Login from "./components/Login.js";
-import User from "./components/User.js";
-import Friends from "./components/Friends.js";
-import Upload from "./components/Upload.js";
-import Edit from "./components/Edit.js";
-import Dashboard from "./components/Dashboard.js";
+
+import Login    from "./components/Authentication/Login.js";
+import Register from "./components/Authentication/Register.js";
+
+import Upload from "./components/Posts/Upload.js";
+import Edit   from "./components/Posts/Edit.js";
+import Post   from "./components/Posts/Post.js";
+import Posts  from "./components/Posts/Posts.js";
+
+import User      from "./components/Users/User.js";
+import Users     from "./components/Users/Users.js";
+import Dashboard from "./components/Users/Dashboard.js";
+
+import Chatrooms   from "./components/Chats/Chatrooms.js";
+import Chatroom    from "./components/Chats/Chatroom.js";
+import PrivateChat from "./components/Chats/PrivateChat.js";
 
 function MyAccountRedirection() {
     const {user} = React.useContext(UserContext);
     return (
         <div className="redirection">
             <Link className="redirection-link" to={`/user/${user.user_id}`}>Profil</Link>
-            <Link className="redirection-link" to="/friends">Amis</Link>
             <Link className="redirection-link" to="/dashboard">Paramètres</Link>
             <Link className="redirection-link" to="/logout">Se deconnecter</Link>
         </div>
@@ -39,7 +44,7 @@ function CommunityRedirection() {
     return (
         <div className="redirection">
             <Link className="redirection-link" to="/chatrooms">Salons textuels</Link>
-            <Link className="redirection-link" to="/games">Jeux</Link>
+            <Link className="redirection-link" to="/users">Utilisateurs</Link>
         </div>
     );
 }
@@ -59,17 +64,24 @@ export default function Routes() {
             { user !== false ?
             <React.Fragment>
                 <Route path="/" exact component={Home} />
+
                 <Route path="/post-redirection" exact component={PostsRedirection} />
                 <Route path="/community-redirection" exact component={CommunityRedirection} />
                 <Route path="/me-redirection" exact component={MyAccountRedirection} />
 
                 <Route path="/posts" exact component={Posts} />
                 <Route path="/upload" exact component={Upload} />
-                <Route path="/user/:user_id" exact component={User} />
-                <Route path="/post/:post_id" exact component={Post} />
                 <Route path="/post/:post_id/edit" component={Edit} />
-                <Route path="/friends" exact component={Friends} /> 
+                <Route path="/post/:post_id" exact component={Post} />
+
+                <Route path="/user/:user_id" exact component={User} />
+                <Route path="/users" exact component={Users} /> 
                 <Route path="/dashboard" exact component={Dashboard} /> 
+
+                <Route path="/chatrooms" exact component={Chatrooms} /> 
+                <Route path="/chatroom/:room_id" exact component={Chatroom} /> 
+                <Route path="/private-message/:room_id" exact component={PrivateChat} /> 
+
             </React.Fragment>: <React.Fragment>
                 <Route path="/register" exact component={Register}/>
                 <Redirect from="*" to="/"/>

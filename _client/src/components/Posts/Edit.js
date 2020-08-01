@@ -1,7 +1,7 @@
 import React from "react";
 
-import {sendForm} from "../utils.js";
-import Message from "./Message.js";
+import {sendForm} from "../../utils.js";
+import Message from "../Utils/Message.js";
 
 export default function Edit(props) {
     //Hooks

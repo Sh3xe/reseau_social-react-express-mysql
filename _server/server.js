@@ -28,7 +28,7 @@ app.use(sessions({ // cookie init
 const custom_middlewares = require("./middlewares.js");
 
 app.use(custom_middlewares.logRequests);
-app.use(express.static(path.join( __dirname, "/client/build" )));
+app.use(express.static(path.join( __dirname, "../_client/build" )));
 app.use(express.static(path.join( __dirname, "/uploads" )));
 app.use(express.json());
 app.use(custom_middlewares.authenticateUser);
@@ -47,7 +47,7 @@ app.use("/api", require("./routes/users_api.js") );
 app.use((req, res, next) => {
     // This middleware is executed when no routes fit
     // (We just send the react app)
-    res.sendFile( path.join(__dirname, "/client/build/index.html") );
+    res.sendFile( path.join(__dirname, "../client/build/index.html") );
 });
 
 //Start

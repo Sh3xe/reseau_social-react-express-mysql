@@ -1,11 +1,11 @@
 import React from "react";
 
 import {Link} from "react-router-dom";
-import {formatDate, sendForm, getUrlQuery} from "../utils.js";
-import {UserContext} from "../App.js";
+import {formatDate, sendForm, getUrlQuery} from "../../utils.js";
+import {UserContext} from "../../App.js";
 
-import FileSlider from "./FileSlider.js";
-import Message from "./Message.js";
+import FileSlider from "../Utils/FileSlider.js";
+import Message    from "../Utils/Message.js";
 
 function Comment({comment, refresh}) {
     //Hooks

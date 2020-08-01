@@ -1,7 +1,7 @@
 import React from "react";
 
-import Message from "./Message.js";
-import {sendForm} from "../utils.js";
+import Message from "../Utils/Message.js";
+import {sendForm} from "../../utils.js";
 
 export default function Upload(props) {
     const start_state = {

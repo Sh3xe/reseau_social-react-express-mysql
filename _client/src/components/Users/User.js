@@ -1,10 +1,10 @@
 import React from "react";
-
-import Message from "./Message.js";
-import {sendForm} from "../utils.js";
-import {UserContext} from "../App.js";
 import {Link, useParams} from "react-router-dom";
-import {formatDate, getUrlQuery} from "../utils.js";
+
+import Message from "../Utils/Message.js";
+import {sendForm} from "../../utils.js";
+import {UserContext} from "../../App.js";
+import {formatDate, getUrlQuery} from "../../utils.js";
 
 function UserPost({post}) {
     return (
@@ -208,7 +208,7 @@ function FriendButton({user_id}) {
         if(relation.relation_status === "friends") {
             setElement(
                 <div>
-                    <button className="button col1">Parler</button>&nbsp;&nbsp;
+                    <button className="button col1"><Link to={`/private-message/${user_id}`}>Parler</Link></button>&nbsp;&nbsp;
                     <button className="button col1" onClick={removeFriend}>Suprimmer</button>
                 </div>
             );

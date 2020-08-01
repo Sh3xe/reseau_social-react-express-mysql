@@ -1,7 +1,7 @@
 import React from "react";
 
-import {UserContext} from "../App.js";
-import {formatDate, sendForm, getUrlQuery} from "../utils.js";
+import {UserContext} from "../../App.js";
+import {formatDate, sendForm, getUrlQuery} from "../../utils.js";
 import {Link} from "react-router-dom";
 
 //FRIEND LIST
@@ -25,6 +25,7 @@ function FriendCard({friend}) {
                 <Link to={`/user/${friend.user_id}`}>{friend.user_name}</Link>
                 <span>Depuis {formatDate(friend.relation_date)}</span>
             </div>
+            <button className="button col1"><Link to={`/private-message/${user.user_id}`}>Parler</Link></button>&nbsp;&nbsp;
             <button className="button col1" onClick={removeFriend}>Supprimer</button>
         </div>
     );
@@ -176,20 +177,20 @@ function FriendSearch() {
     const [search_timeout, setSearchTimeout] = React.useState([]);
     const [state, setState] = React.useState({
         search: "",
-        start: 0,
-        step: 8
+        start: 0
     });
 
+    const step = 8;
     //Functions
 
     const pageMinus = function() {
-        if(state.start >= state.step)
-            setState({...state, start: state.start + state.step });
+        if(state.start >= step)
+            setState({...state, start: state.start + step });
     }
 
     const pagePlus = function() {
-        if(users.length >= state.step + 1)
-            setState({...state, start: state.start + state.step });
+        if(users.length >= step + 1)
+            setState({...state, start: state.start + step });
     }
 
     const handleSearchChange = function(e) {
@@ -204,7 +205,7 @@ function FriendSearch() {
         const query_params = getUrlQuery({
             search: state.search,
             start: state.start,
-            step: state.step
+            step: step
         });
 
         fetch(`/api/users?${query_params}`)
@@ -213,7 +214,7 @@ function FriendSearch() {
             .catch(()=>{console.log("problème")});
     }
 
-    React.useEffect(searchUsers, [state.start, state.step]);
+    React.useEffect(searchUsers, [state.start]);
     
     React.useEffect(() => {
         if(search_timeout) {
@@ -245,51 +246,41 @@ function FriendSearch() {
 }
 
 //MAIN
-function FriendMenu({changeSection}) {
+function FriendMenu({changeSection, curr_section}) {
     //Render
     return(
         <div className="friend-menu">
             <span 
-                className="friend-link" 
+                className="friend-link" id={curr_section === "search" ? "selected" : ""}
+                onClick={() => changeSection("search")}
+            >Rechercher</span>
+            <span 
+                className="friend-link" id={curr_section === "friends" ? "selected" : ""}
                 onClick={() => changeSection("friends")}
             >Amis</span>
             <span 
-                className="friend-link"
+                className="friend-link" id={curr_section === "requests" ? "selected" : ""}
                 onClick={() => changeSection("requests")}
             >Requêtes</span>
-            <span 
-                className="friend-link"
-                onClick={() => changeSection("search")}
-            >Rechercher</span>
         </div>
     );
 }
 
-export default function Friends() {
+export default function Users() {
     //Hooks
-    const [current_element, setCurrentElement] = React.useState(<FriendList />);
-
-    //Functions
-    const handleSectionChange = function(new_el) {
-        switch(new_el) {
-            case "friends":
-                setCurrentElement(<FriendList />);
-                break;
-            case "requests":
-                setCurrentElement(<RequestList />);
-                break;
-            case "search":
-                setCurrentElement(<FriendSearch />);
-                break;
-            default: break;
-        }
+    const elements = {
+        friends: <FriendList />,
+        requests: <RequestList />,
+        search: <FriendSearch />
     }
+
+    const [selected_section, setSelectedSection] = React.useState("search");
 
     //Render
     return (
         <div className="friends-list">
-            <FriendMenu changeSection={handleSectionChange}/>
-            {current_element}
+            <FriendMenu changeSection={setSelectedSection} curr_section={selected_section}/>
+            {elements[selected_section]}
         </div>
     );
 }

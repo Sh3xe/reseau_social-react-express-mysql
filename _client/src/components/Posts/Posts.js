@@ -1,7 +1,7 @@
 import React from "react";
 
-import Message from "./Message.js";
-import {formatDate, getUrlQuery} from "../utils.js";
+import Message from "../Utils/Message.js";
+import {formatDate, getUrlQuery} from "../../utils.js";
 import {Link} from "react-router-dom";
 
 function Post({post}) {

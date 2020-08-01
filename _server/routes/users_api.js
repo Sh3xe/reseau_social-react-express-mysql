@@ -69,7 +69,6 @@ router.get("/current_user", async(req, res) => {
 });
 
 router.get("/user/:user_id/posts", async(req, res) => {
-
     // Gets the posts of a user
 
     const {start, step} = req.query;
@@ -222,7 +221,7 @@ router.put("/dashboard/avatar", async(req, res) => {
 //PATCH
 router.patch("/dashboard", async(req, res) => {
     //get and validate form
-    const {username, bio} = req.body;
+    const {username, bio, password, email} = req.body;
 
     let colors = undefined;
     if(req.body.colors) {
@@ -233,10 +232,14 @@ router.patch("/dashboard", async(req, res) => {
 
 	const errors = utils.validateForm({
 		username,
-		bio
+        bio,
+        email,
+        password
 	}, {
 		username: {max:100},
-		bio: {max: 1317}
+        bio: {max: 1317},
+        email: {min:3, max:255},
+        password: {min:8, max:60}
 	}, true);
 
 	if(errors.length) {
@@ -246,7 +249,7 @@ router.patch("/dashboard", async(req, res) => {
     }
     
     //Modification utilisateur
-    const {error} = await users.update(req.user.user_id, {name: username, bio, colors});
+    const {error} = await users.update(req.user.user_id, {name: username, bio, colors, email, password});
     
     if(!error) {
         res.status(200);

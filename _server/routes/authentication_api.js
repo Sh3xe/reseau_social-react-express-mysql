@@ -4,7 +4,7 @@ const express = require("express");
 const fs = require("fs");
 const router = express.Router();
 
-const {validateForm} = require("../utils.js");
+const {validateForm, parseKeyValueString} = require("../utils.js");
 const users = require("../database/users.js");
 
 router.post("/register", async(req, res) => {
@@ -79,12 +79,17 @@ router.post("/login", async(req, res) => {
 	//Update user token and put inside session
 	await users.updateToken(data.user_id);
 
-	const updated_user =  await users.getById(data.user_id);
+	const updated_user = await users.getById(data.user_id);
 
 	req.session.user = updated_user.data;
 	req.session.user_token = req.session.user.user_token;
 
-	res.json(updated_user.data);
+	const colors = parseKeyValueString(data.user_colors);
+        
+    res.json({
+        ...updated_user.data,
+        ...colors
+    });
 });
 
 router.get("/logout", (req, res) => {

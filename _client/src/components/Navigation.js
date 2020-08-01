@@ -31,16 +31,16 @@ export default function() {
                         <Link to="/community-redirection">Communauté</Link>
                         <ul className="dropdown-content">
                             <li><Link to="/chatrooms">Salons</Link></li>
-                            <li><Link to="/games">Jeux</Link></li>
+                            <li><Link to="/users">utilisateurs</Link></li>
                         </ul>
                     </li>
+                    <li><Link to="/games">Jeux</Link></li>
                 </ul>
                 <ul className="site-user">
                     <li className="dropdown">
                         <Link to="/me-redirection">Mon compte</Link>
                         <ul className="dropdown-content">
                             <li><Link to={`/user/${user.user_id}`}>Profil</Link></li>
-                            <li><Link to="/friends">Amis</Link></li>
                             <li><Link to="/dashboard">Paramètres</Link></li>
                             <li><a href="/" onClick={handleLogout}>Se deconnecter</a></li>
                         </ul>
