@@ -41,13 +41,14 @@ app.use("/api", require("./routes/authentication_api.js") );
 //Login required
 app.use("/api", loginRequired);
 app.use("/api", require("./routes/posts_api.js") );
+app.use("/api", require("./routes/chat_api.js") );
 app.use("/api", require("./routes/users_api.js") );
 
 // React App
 app.use((req, res, next) => {
     // This middleware is executed when no routes fit
     // (We just send the react app)
-    res.sendFile( path.join(__dirname, "../client/build/index.html") );
+    res.sendFile( path.join(__dirname, "../_client/build/index.html") );
 });
 
 //Start

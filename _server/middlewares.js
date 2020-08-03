@@ -14,7 +14,7 @@ async function authenticateUser(req, res, next) {
             const {error, data} = await users.getByToken(req.session.user_token);
             if(!error) {
                 req.user = data;
-            } else console.log(error)
+            } else console.log(error);
         }
     } catch(e) {}
 

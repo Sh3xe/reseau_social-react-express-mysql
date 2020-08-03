@@ -20,12 +20,12 @@ function FriendCard({friend}) {
 
     return (
         <div className="friend-card">
-            <img src={`/${user.user_avatar}`} alt=""/>
+            <img src={`/${friend.user_avatar}`} alt=""/>
             <div className="friendcard-infos">
                 <Link to={`/user/${friend.user_id}`}>{friend.user_name}</Link>
                 <span>Depuis {formatDate(friend.relation_date)}</span>
             </div>
-            <button className="button col1"><Link to={`/private-message/${user.user_id}`}>Parler</Link></button>&nbsp;&nbsp;
+            <button className="button col1"><Link to={`/private-message/${friend.user_id}`}>Parler</Link></button>&nbsp;&nbsp;
             <button className="button col1" onClick={removeFriend}>Supprimer</button>
         </div>
     );
@@ -172,7 +172,7 @@ function UserSearchContent({users}) {
 }
 
 function FriendSearch() {
-    //Hooks
+    //Vars
     const [users, setUsers] = React.useState([]);
     const [search_timeout, setSearchTimeout] = React.useState([]);
     const [state, setState] = React.useState({
@@ -181,8 +181,8 @@ function FriendSearch() {
     });
 
     const step = 8;
-    //Functions
 
+    //Functions
     const pageMinus = function() {
         if(state.start >= step)
             setState({...state, start: state.start + step });
@@ -205,7 +205,8 @@ function FriendSearch() {
         const query_params = getUrlQuery({
             search: state.search,
             start: state.start,
-            step: step
+            step: step,
+            type: "public"
         });
 
         fetch(`/api/users?${query_params}`)

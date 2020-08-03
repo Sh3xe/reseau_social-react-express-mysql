@@ -18,16 +18,6 @@ function objectToKeyValue(object) {
     }
     return query.slice(0, query.length - 1);
 }
-/*
-function addZeros(value, length, filler = "0") {
-    try {
-        let str = value.toString();
-        while(str.length < length) {
-            str = `${filler}${str}`;
-        }
-        return str;
-    } catch(e) { return null }
-}*/
 
 function generateToken(length = 64) {
 	const set = "0123456789azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN"
@@ -37,33 +27,22 @@ function generateToken(length = 64) {
     }
     return token;
 }
-/*
-function formatDate(d) {
-	const {day, month, year, hours, minutes} = {
-		day: addZeros(d.getDate(), 2),
-		month: addZeros(d.getMonth() + 1, 2),
-		year: d.getFullYear(),
-		hours: addZeros(d.getHours(), 2),
-		minutes: addZeros(d.getMinutes(), 2),
-	}
-	
-	return `${day}/${month}/${year}, ${hours}h${$minutes}`;
-}*/
 
 function validateForm(form, conditions, null_enabled = false) {
 
     let errors = [];
     for(let [key, value] of Object.entries(form)) {
-        if(!value) {
+        if(value === undefined) {
             if(!null_enabled)
                 errors.push(`${key} non définie`);
             continue;
         }
 
-        let min, max = undefined;
+        let min, max, type = undefined;
         if(conditions[key] != undefined) {
             max = conditions[key].max;
             min = conditions[key].min;
+            type = conditions[key].type;
 
         } else continue;
 
@@ -73,6 +52,10 @@ function validateForm(form, conditions, null_enabled = false) {
 
         if(max != undefined && value.length > max) {
             errors.push(`${key} doit être inférieur à ${max}`);
+        }
+
+        if(type != undefined && typeof value !== type) {
+            errors.push(`${key} doit être un ${type}, ${typeof key} reçu`);
         }
     }
 

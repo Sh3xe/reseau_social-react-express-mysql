@@ -16,19 +16,17 @@ export default function Edit(props) {
 
     //Functions
     const handleTitleChange = function(e) {
-        const value = e.target.value
-        setState({
-            ...state,
-            title: value
-        });
+        const value = e.target.value;
+
+        if(value.length <= 57)
+            setState({...state, title: value});
     }
 
     const handleContentChange = function(e) {
-        const value = e.target.value
-        setState({
-            ...state,
-            content: value
-        });
+        const value = e.target.value;
+
+        if(value.length <= 2500)
+            setState({...state, content: value});
     }
 
     const handleSelectChange = function(e) {
@@ -79,10 +77,12 @@ export default function Edit(props) {
     return (
         <div className="form-container upload edit-form">
             <Message messages={messages}/>
+            <label htmlFor="title">Titre <span className="char-counter">{`${state.title.length}/57`}</span></label>
             <input 
                 className="input t1"
                 type="text" value={state.title} onChange={handleTitleChange}
             ></input>
+            <label htmlFor="title">Contenu <span className="char-counter">{`${state.content.length}/2500`}</span></label>
             <textarea 
                 className="input t1"
                 value={state.content} onChange={handleContentChange}

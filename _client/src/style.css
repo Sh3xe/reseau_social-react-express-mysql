@@ -525,6 +525,10 @@ ul.dropdown-content a{
     margin-bottom: 1em;
 }
 
+.edit-form input[type=checkbox] {
+    width: auto;
+}
+
 .confirmation-button {
     border: 1px solid grey;
     background-color: rgba(0, 0, 0, 0);
@@ -569,6 +573,10 @@ ul.dropdown-content a{
     transition: .3s;
 }
 
+button.submit {
+    width: 100%;
+}
+
 .select-input {
     background-color: white;
     border-radius: 4px;
@@ -608,6 +616,11 @@ ul.dropdown-content a{
     width: 100%;
     display: block;
     margin-bottom: 10px;
+}
+
+.login-form input[type=checkbox] {
+    width: auto;
+    display: inline-block;
 }
 
 button.toggle-password{
@@ -737,6 +750,7 @@ div.mini-profile-rect {
     border-radius: 4px;
 }
 
+.chat-card,
 .user-card,
 .friend-card {
     display: flex;
@@ -750,6 +764,11 @@ div.mini-profile-rect {
     margin: 1em auto;
 }
 
+.chat-card {
+    padding: 10px;
+}
+
+.chatcard-infos,
 .usercard-infos *,
 .friendcard-infos * {
     display: block;
@@ -772,6 +791,14 @@ div.mini-profile-rect {
 
 .friend-section_container {
     margin-top: 1em;
+}
+
+.chat-card h3{
+    margin: 0;
+}
+
+.chat-card a{
+    text-decoration: none;
 }
 
 /*PRT1*/
