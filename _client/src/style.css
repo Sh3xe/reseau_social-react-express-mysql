@@ -437,6 +437,24 @@ ul.dropdown-content a{
 }
 
 /*Buttons*/
+
+.edit-button {
+    padding: 0 5px;
+    background: white;
+    color: black;
+    margin-left: 10px;
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0);
+    cursor: pointer;
+}
+
+.edit-button:hover {
+    border-color: white;
+    background-color: rgba(255, 255, 255, 0);
+    color: white;
+    transition: .3s;
+}
+
 .button{
     border-radius: 3px;
     min-width: 50px;
@@ -460,19 +478,19 @@ ul.dropdown-content a{
     transition: .5s;
 }
 
-.col2{
+.col2 {
     background-color: rgb(180, 225, 255);
     border: solid 1px rgb(180, 225, 255);
     color: white;
 }
 
-.button.col2:hover{
+.button.col2:hover {
     background-color: rgba(0, 0, 0, 0);
     color: rgb(180, 225, 255);
     transition: .5s;
 }
 
-.col1{
+.col1 {
     background-color: rgb(93, 190, 255);
     border: solid 1px rgb(93, 190, 255);
     color: white;
@@ -481,6 +499,18 @@ ul.dropdown-content a{
 .button.col1:hover{
     background-color: rgba(0, 0, 0, 0);
     color: rgb(93, 190, 255);
+    transition: .5s;
+}
+
+.col3 {
+    background-color: rgb(255, 93, 93);
+    border: solid 1px rgb(255, 93, 93);
+    color: white;
+}
+
+.button.col3:hover{
+    background-color: rgba(0, 0, 0, 0);
+    color: rgb(255, 93, 93);
     transition: .5s;
 }
 /*confirmation-message*/
@@ -642,6 +672,13 @@ button.submit {
     margin: 0 auto;
 }
 
+.chat-create-form {
+    background-color: white;
+    border: 1px solid grey;
+    border-radius: 4px;
+    margin-top: 1em;
+}
+
 .login-form {
     background-color: white;
     border-left: 1px solid grey;
@@ -650,17 +687,19 @@ button.submit {
     border-radius: 0 0 4px 4px;
 }
 
+.chat-create-form,
 .login-head,
 .login-form {
     padding: 10px;
 }
 
+.chat-create-form input,
 .login-form input{
     width: 100%;
     display: block;
     margin-bottom: 10px;
 }
-
+.chat-create-form input[type=checkbox],
 .login-form input[type=checkbox] {
     width: auto;
     display: inline-block;

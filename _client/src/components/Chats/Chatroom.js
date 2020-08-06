@@ -44,9 +44,7 @@ function MessagesContainer({messages}) {
     }
 
     const scrollToBottom = function() {
-        // scroll to the bottom
         if(messages_ref.current !== undefined) {
-            console.log(messages_ref.current, messages_ref.current.scrollHeight)
             messages_ref.current.scrollTop = messages_ref.current.scrollHeight;
         }
     }
@@ -67,8 +65,9 @@ function UserList({users}) {
     let users_el = []
 
     for(let i = 0; i < users.length; i++) {
+        const u = users[i];
         users_el.push(
-            <li key={i}><img src={`/${users[i].user_avatar}`} alt="" /> {users[i].user_name} <span className="since-date">Depuis 120m</span></li>
+            <li key={i}><img src={`/${u.user_avatar}`} alt="" /> <Link to={`/user/${u.user_id}`}>{u.user_name}</Link> <span className="since-date">Depuis 120m</span></li>
         );
     }
 
@@ -117,7 +116,10 @@ export default function Chatroom() {
     const {user} = React.useContext(UserContext);
     const {room_id} = useParams();
 
-    const [room_name, setRoomName] = React.useState("");
+    // undefined if not fetched yet, false if not found,
+    // defined as object if fetched successfully
+    const [room_data, setRoomData] = React.useState("");
+
     const [chat_messages, setChatMessages] = React.useState([]);
     const [users, setUsers] = React.useState([]);
     
@@ -127,16 +129,16 @@ export default function Chatroom() {
     }
 
     const addMessage = function(message) {
-        console.log(chat_messages)
-        //setChatMessages([...chat_messages, message]);
+        setChatMessages([message, ...chat_messages]);
     }
 
     // Socket logic
     React.useEffect(() => {
         // Fetch roomName
         fetch(`/api/chatroom/${room_id}`)
-        .then(res => res.json())
-        .then(({chatroom_name}) => setRoomName(chatroom_name))
+            .then(res => res.json())
+            .then((room) => setRoomData(room))
+            .catch(() => setRoomData(false) );
         
         // Join a room
         socket.emit("new-user", {user_token: user.user_token, room_id});
@@ -174,30 +176,28 @@ export default function Chatroom() {
             setUsers(new_users);
         });
 
-        socket.on("message", msg => {
-            addMessage(msg);
-        });
+        socket.on("message", addMessage);
     // eslint-disable-next-line
-    }, []);
-
-    React.useEffect(() => {
-        console.log(chat_messages);
-        console.log(users);
-        console.log(room_name);
-    }, [chat_messages, users, room_name])
+    });
 
     return (
-        <div className="chat">
-            <header className="chat-header">
-                Salon - {room_name}
-            </header>
-            <main className="chat-main">
-                <UserList users={users}/>
-                <main className="messages-container">
-                    <MessagesContainer messages={chat_messages}/>
-                    <ChatForm sendMessage={sendMessage}/>
+        <div className="container-content">
+            {room_data === false ? <div className="log-message red">
+                Impossible de récuperer ce salon.
+            </div>: ""} 
+            <div className="chat">
+                <header className="chat-header">
+                    Salon - {room_data ? room_data.chatroom_name : ""}
+                    {room_data && room_data.chatroom_admin === user.user_id ? <button className="edit-button"><Link to={`/chatroom/${room_id}/edit`}>Editer</Link></button>: ""}
+                </header>
+                <main className="chat-main">
+                    <UserList users={users}/>
+                    <main className="messages-container">
+                        <MessagesContainer messages={chat_messages}/>
+                        <ChatForm sendMessage={sendMessage}/>
+                    </main>
                 </main>
-            </main>
+            </div>
         </div>
     );
 }

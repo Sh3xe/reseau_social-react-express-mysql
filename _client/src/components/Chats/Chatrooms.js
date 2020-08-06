@@ -43,6 +43,7 @@ function CreateChatrooms() {
 
         sendForm(req_params, {name: state.title, is_private: state.is_private}, (err, res) => {
             if(err) {
+                if(!res) return;
                 const new_messages = [];
                 for(let message of JSON.parse(res)) {
                     new_messages.push({
@@ -59,7 +60,7 @@ function CreateChatrooms() {
 
     //Render
     return (
-        <form className="login-form">
+        <form className="chat-create-form">
             <Message messages={messages} /> 
             <div>
                 <label htmlFor="title"> Titre: <span className="char-counter">{`${state.title.length}/100`}</span></label>

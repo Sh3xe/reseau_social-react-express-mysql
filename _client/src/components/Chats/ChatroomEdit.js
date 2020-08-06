@@ -29,6 +29,17 @@ export default function ChatroomEdit() {
             setState({...state, title: value});
     }
 
+    const handleDelete = function() {
+        fetch(`/api/chatroom/${room_id}`, {method: "DELETE"})
+            .then(res => {
+                if(res.ok) {
+                    history.push("/chatrooms")
+                } else {
+                    setMessages([{content:"Impossible de suprimmer ce salon", col:"red"}])
+                }
+            });
+    }
+
     const handleSubmit = function(e) {
         e.preventDefault();
 
@@ -89,6 +100,7 @@ export default function ChatroomEdit() {
                 onChange={handleCheckboxChange}
             ></input>
             <button className="button col1" onClick={handleSubmit}>Modifier</button>
+            <button className="button col3" onClick={handleDelete}>Suprimmer</button>
         </div>
     );
 }

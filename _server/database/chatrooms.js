@@ -37,8 +37,8 @@ function search(is_private, user_id, {search_query, start, step}) {
         ${search_command ? "AND" : "WHERE"}
         chatroom_type = "${is_private ? "private": "public"}"
         ${is_private ? `
-        AND chatroom_id IN (SELECT grant_chatroom FROM rs_chatroom_grants WHERE grant_user = ?)
-        OR chatroom_admin = ?` : ""}
+        AND chatroom_admin = ?
+        OR chatroom_id IN (SELECT grant_chatroom FROM rs_chatroom_grants WHERE grant_user = ?)` : ""}
         LIMIT ?, ?`;
 
 
@@ -48,21 +48,32 @@ function search(is_private, user_id, {search_query, start, step}) {
     return db.exec(query, params);
 }
 
-function add({name, is_private, user_id}) {
+function add({name, chatroom_type, user_id}) {
     const query = `
-        INSERT INTO rs_chatrooms (chatroom_admin, chatroom_name, chatroom_is_private)
+        INSERT INTO rs_chatrooms (chatroom_admin, chatroom_name, chatroom_type)
         VALUES(?, ?, ?)`;
-    
-    return db.exec(query, [user_id, name, is_private]);
+        
+    return db.exec(query, [user_id, name, chatroom_type]);
 }
 
-function remove(id, user) {
-    const query = `
-        DELETE FROM rs_chatrooms
-        WHERE chatroom_id = ?
-        AND chatroom_admin = ?`;
+async function remove(chatroom_id, user_id) {
 
-    return db.exec(query, [id, user]);
+    const is_admin = await isChatroomAdmin(chatroom_id, user_id)
+
+    if(is_admin) {
+        await db.exec(`
+            DELETE FROM rs_chat_messages
+            WHERE message_chatroom = ?
+        `, [chatroom_id]);
+    
+        const query = `
+            DELETE FROM rs_chatrooms
+            WHERE chatroom_id = ?`;
+    
+        return db.exec(query, [chatroom_id]);
+    } else {
+        return { error: "L'utilisateur n'a pas les droits necessaires pour suprimmer ce salon."}
+    }
 }
 
 function update(chatroom_id, user_id, {name, type}) {
@@ -215,7 +226,7 @@ function getAllowedUsers(chatroom_id) {
     return db.exec(query, [chatroom_id]);
 }
 
-async function isChatroomAdmin(user_id, chatroom_id) {
+async function isChatroomAdmin(chatroom_id, user_id) {
     const query = `
         SELECT * FROM rs_chatrooms
         WHERE chatroom_id = ?
@@ -230,7 +241,7 @@ async function isUserAllowed(user_id, chatroom_id) {
 
     const {data} = await get(chatroom_id);
     
-    if(!data[0]) {
+    if(data === undefined) {
         return false;
     }
 

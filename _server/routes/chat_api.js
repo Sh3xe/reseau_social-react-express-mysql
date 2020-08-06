@@ -12,7 +12,7 @@ router.get("/chatrooms", async(req, res) => {
     const is_private = req.query.type === "private";
 
     //Call the database function
-    const search_params = {search, start, step};
+    const search_params = {search_query: search, start, step};
     const {error, data} = await chatrooms.search(is_private, req.user.user_id, search_params);
 
     if(error) {
@@ -52,10 +52,11 @@ router.post("/chatrooms", async(req, res) => {
         res.json(validation_errors);
         return;
     }
-
+    
     //Call the database function
     const {error, data} = await chatrooms.add({
-        name, is_private,
+        name,
+        chatroom_type: is_private ? "private" : "public",
         user_id: req.user.user_id
     });
 
