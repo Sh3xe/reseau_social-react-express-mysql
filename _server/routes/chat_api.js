@@ -15,8 +15,6 @@ router.get("/chatrooms", async(req, res) => {
     const search_params = {search, start, step};
     const {error, data} = await chatrooms.search(is_private, req.user.user_id, search_params);
 
-    console.log(is_private, req.user.user_id, search_params)
-
     if(error) {
         res.status(400);
         res.end();

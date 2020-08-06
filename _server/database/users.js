@@ -32,11 +32,11 @@ async function search({search_query, start, step}) {
 async function getByToken(user_token) {
     const query = `
         SELECT 
-            user_name, user_email,
-            user_bio, user_token,
-            user_status, user_registration,
-            user_id, user_avatar,
-            user_colors
+            user_name, user_bio,
+            user_token, user_status, 
+            user_registration, user_id, 
+            user_avatar, user_colors,
+            user_email
         FROM rs_users
         WHERE user_token = ?`;
 
@@ -47,11 +47,10 @@ async function getByToken(user_token) {
 async function getById(user_id) {
     const query = `
         SELECT 
-            user_name, user_email,
-            user_bio, user_token,
-            user_status, user_registration,
-            user_id, user_avatar,
-            user_colors
+            user_name, user_bio,
+            user_token, user_status, 
+            user_registration, user_id, 
+            user_avatar, user_colors
         FROM rs_users
         WHERE user_id = ?`;
 

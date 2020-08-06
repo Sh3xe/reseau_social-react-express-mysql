@@ -12,7 +12,6 @@ const config = require("../config.js");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketio(server);
 
 app.use(sessions({ // cookie init
     cookieName: "session",
@@ -23,6 +22,12 @@ app.use(sessions({ // cookie init
         sameSite: "Strict"
     }
 }));
+
+//socketio chats
+const io = socketio(server);
+const ChatApp = require("./Chat.js");
+
+new ChatApp(io);
 
 // middlewares
 const custom_middlewares = require("./middlewares.js");

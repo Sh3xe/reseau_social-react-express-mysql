@@ -5,8 +5,8 @@ const db = require("./DatabaseManager.js");
 //CRUD
 function search(is_private, user_id, {search_query, start, step}) {
     //Add default value
-    if(!start) start = 0;
-    if(!step) step = 8;
+    if(start === undefined) start = 0;
+    if(step === undefined) step = 8;
 
     //Init variables
     let search_command = "";
@@ -26,7 +26,7 @@ function search(is_private, user_id, {search_query, start, step}) {
         }
     }
 
-    if(is_private) params.push(user_id);
+    if(is_private) params.push(user_id, user_id);
 
     //Puting together the query
     const query = `
@@ -36,7 +36,9 @@ function search(is_private, user_id, {search_query, start, step}) {
         ${search_command ? `WHERE ${search_command}` : ""}
         ${search_command ? "AND" : "WHERE"}
         chatroom_type = "${is_private ? "private": "public"}"
-        ${is_private ? "AND chatroom_id IN (SELECT grant_chatroom FROM rs_chatroom_grants WHERE grant_user = ?)" : ""}
+        ${is_private ? `
+        AND chatroom_id IN (SELECT grant_chatroom FROM rs_chatroom_grants WHERE grant_user = ?)
+        OR chatroom_admin = ?` : ""}
         LIMIT ?, ?`;
 
 
@@ -106,27 +108,81 @@ function get(chatroom_id) {
 
 //MESSAGES get/add/remove
 async function sendPrivateMessage(user_from, user_to, content) {
-    
+    const query = `
+        INSERT INTO rs_private_messages (mp_from, mp_to, mp_content)
+        VALUES (?, ?, ?)`;
+
+    return db.exec(query, [user_from, user_to, content]);
 }
 
-async function removePrivateMessages(user_from, user_to, message_id) {
-    
+async function removePrivateMessage(user_from, message_id) {
+    const query = `
+        DELETE FROM rs_private_messages
+        WHERE mp_id = ?
+        AND mp_from = ?`;
+
+    return db.exec(query, [message_id, user_from]);
 }
 
-async function getPrivateMessages(chatroom_id, {start, step, user1, user2}) {
-    
+async function getPrivateMessages(user1, user2, {start, step}) { // PAS FINI
+
+    if(start === undefined) {
+        start = 0;
+    }
+
+    if(step === undefined) {
+        step = 30;
+    }
+
+    const query = `
+        SELECT mp_content, mp_date, mp_from, mp_to, user_name
+        FROM rs_private_messages
+        FULL JOIN rs_users
+        ON mp_from = user_id OR mp_to = user_id
+        WHERE (mp_from = ? AND mp_to = ?) OR (mp_from = ? AND mp_to = ?)
+        ORDER BY mp_date DESC 
+        LIMIT ?, ?`;
+
+    return db.exec(query, [user1, user2, user2, user1, start, step]);
 }
 
-async function sendMessage(user_id, chatroom_id, content) {
-    
+function sendMessage(user_id, chatroom_id, content) {
+    const query = `
+        INSERT INTO rs_chat_messages(message_user, message_chatroom, message_content)
+        VALUES (?, ?, ?)`;
+
+    return db.exec(query, [user_id, chatroom_id, content]);
 }
 
-async function removeMessages(user_id, message_id) {
-    
+async function removeMessage(user_id, message_id) {
+    const query = `
+        DELETE FROM rs_chat_messages
+        WHERE message_user = ? 
+        AND message_id = ?`;
+
+    return db.exec(query, [user_id, message_id]);
 }
 
 async function getMessages(chatroom_id, {start, step}) {
-    
+
+    if(start === undefined) {
+        start = 0;
+    }
+
+    if(step === undefined) {
+        step = 30;
+    }
+
+    const query = `
+        SELECT message_content, message_date, message_user, message_chatroom, message_id,
+        user_name, user_avatar, user_id, user_registration
+        FROM rs_chat_messages FULL JOIN rs_users
+        ON message_user = user_id
+        WHERE message_chatroom = ?
+        ORDER BY message_date DESC
+        LIMIT ?, ?`;
+
+    return db.exec(query, [chatroom_id, start, step])
 }
 
 //GRANTS
@@ -171,6 +227,17 @@ async function isChatroomAdmin(user_id, chatroom_id) {
 }
 
 async function isUserAllowed(user_id, chatroom_id) {
+
+    const {data} = await get(chatroom_id);
+    
+    if(!data[0]) {
+        return false;
+    }
+
+    if(data[0].chatroom_admin === user_id || data[0].chatroom_type === "public") {
+        return true;
+    }
+
     const query = `
         SELECT * FROM rs_chatroom_grants
         WHERE grant_user = ?
@@ -191,9 +258,9 @@ module.exports = {
     grantUser,
     removeGrant,
     sendPrivateMessage,
-    removePrivateMessages,
+    removePrivateMessage,
     sendMessage,
-    removeMessages,
+    removeMessage,
     getAllowedUsers,
     isChatroomAdmin,
     isUserAllowed

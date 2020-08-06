@@ -153,43 +153,6 @@ ul.dropdown-content a{
 }
 
 /*Chat*/
-.chat-header {
-    background: black;
-    color: white;
-    padding: 5px;
-    text-align: center;
-}
-
-.chat-aside {
-    overflow-y: hidden;
-    width: 200px;
-    padding: 1em;
-    flex: none;
-    color: white;
-    background-color: black;
-}
-
-.chat-aside h1{
-    margin: 0;
-}
-
-.chat-aside ul{
-    list-style: circle;
-    padding-left: 20px;
-    margin: 10px 0;
-}
-
-.chat {
-    border-radius: 5px;
-    display: block;
-    overflow: hidden;
-    background-color: white;
-}
-
-.chat-main {
-    display: flex;
-}
-
 .login-form {
     width: 100%;
     box-shadow: lightgray 2px 2px 2px 0;
@@ -213,10 +176,76 @@ ul.dropdown-content a{
     font-size: 0.8em;
 }
 
+.chat-header {
+    background: black;
+    color: white;
+    padding: 5px;
+    text-align: center;
+}
+
+.chat-aside {
+    overflow-y: hidden;
+    width: 200px;
+    padding: 0 1em;
+    flex: none;
+    color: white;
+    background-color: black;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.chat-aside h1{
+    margin: 0;
+}
+
+.chat-aside ul{
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.chat-aside ul li img{
+    width: 40px;
+    height: 40px;
+    float: left;
+    margin-right: 5px;
+    border-radius: 3px;
+}
+
+.chat-aside ul li{
+    line-height: 20px;
+    margin: 8px 0;
+}
+
+.chat {
+    border-radius: 5px;
+    display: block;
+    overflow: hidden;
+    background-color: white;
+
+    width: 80%;
+    margin: 0 auto;
+}
+
+.chat-main {
+    display: flex;
+    height: 400px;
+    resize: vertical;
+    overflow: auto;
+}
+
+.messages-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+}
+
 .messages {
-    height: 500px;
     overflow-y: scroll;
     scrollbar-width: none;
+    height: auto;
 }
 
 .messages::-webkit-scrollbar {
@@ -226,6 +255,13 @@ ul.dropdown-content a{
 .message {
     margin-bottom: 10px;
     padding: 5px;
+}
+
+.message img {
+    width: 20px;
+    height: 20px;
+    float: left;
+    margin-right: 5px;
 }
 
 .message-content {
@@ -249,12 +285,19 @@ ul.dropdown-content a{
 
 .message-infos a {
 	color: rgb(100, 100, 100);
-	text-decoration: none;
+    text-decoration: none;
+    line-height: 20px;
 }
 
 .date {
 	font-size: 0.8em;
 	color: grey;
+}
+
+.since-date {
+    color: rgba(255, 255, 255, 0.801);
+    font-size: 0.8em;
+    display: block;
 }
 
 /*Feed*/
@@ -1146,5 +1189,21 @@ textarea.edit-comment {
     div.color-container,
     .confirmation-button.extended {
         width: 100%;
+    }
+}
+
+@media only screen and (max-width: 640px) {
+    .chat-main {
+        display: block;
+    }
+
+    .chat-aside {
+        display: none;
+    }
+}
+
+@media only screen and (max-height: 450px) {
+    .chat-main {
+        height: 300px;
     }
 }
