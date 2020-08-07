@@ -61,8 +61,11 @@ function MessagesContainer({messages}) {
     );
 }
 
-function UserList({users}) {
-    let users_el = []
+function UserList({users, show}) {
+
+    if(show === false) return <div></div>;
+
+    let users_el = [];
 
     for(let i = 0; i < users.length; i++) {
         const u = users[i];
@@ -114,11 +117,11 @@ function ChatForm({sendMessage}) {
 export default function Chatroom() {
     // Vars
     const {user} = React.useContext(UserContext);
-    const {room_id} = useParams();
+    const {room_id, user_to} = useParams();
 
     // undefined if not fetched yet, false if not found,
     // defined as object if fetched successfully
-    const [room_data, setRoomData] = React.useState("");
+    const [chat_data, setChatData] = React.useState("");
 
     const [chat_messages, setChatMessages] = React.useState([]);
     const [users, setUsers] = React.useState([]);
@@ -135,19 +138,30 @@ export default function Chatroom() {
     // Socket logic
     React.useEffect(() => {
         // Fetch roomName
-        fetch(`/api/chatroom/${room_id}`)
-            .then(res => res.json())
-            .then((room) => setRoomData(room))
-            .catch(() => setRoomData(false) );
+        if(room_id !== undefined) {
+            fetch(`/api/chatroom/${room_id}`)
+                .then(res => res.json())
+                .then((room) => setChatData({...room, type:"chatroom"}))
+                .catch(() => setChatData(false) );
+
+        } else if(user_to !== undefined) {
+            fetch(`/api/user/${user_to}`)
+                .then(res => res.json())
+                .then((user) => setChatData({...user, type:"private_room"}))
+                .catch(() => setChatData(false) );
+        }
         
-        // Join a room
-        socket.emit("new-user", {user_token: user.user_token, room_id});
+        // Join a room or a conversation
+        if(room_id !== undefined)
+            socket.emit("new-user", {user_token: user.user_token, room_id});
+        else if(user_to !== undefined)
+            socket.emit("new-user", {user_token: user.user_token, user_to});
 
         // Quit the room
         return () => {
             socket.emit("chat-exit");
         }
-    }, [room_id, user]);
+    }, [room_id, user_to, user]);
 
     React.useEffect(() => {
         socket.on("chat_error", err => console.log(err));
@@ -180,18 +194,36 @@ export default function Chatroom() {
     // eslint-disable-next-line
     });
 
+
+    const ChatroomHeader = () => {
+        return (
+            <header className="chat-header">
+                Salon - {chat_data.chatroom_name}
+                {chat_data.chatroom_admin === user.user_id ? <button className="edit-button"><Link to={`/chatroom/${room_id}/edit`}>Editer</Link></button>: ""}
+            </header>
+        )
+    }
+
+    const PrivateConversationHeader = () => {
+        return (
+            <header className="chat-header">
+                Conversation - {chat_data.user_name}
+            </header>
+        )
+    }
+
     return (
         <div className="container-content">
-            {room_data === false ? <div className="log-message red">
+            {chat_data === false ? <div className="log-message red">
                 Impossible de récuperer ce salon.
             </div>: ""} 
             <div className="chat">
                 <header className="chat-header">
-                    Salon - {room_data ? room_data.chatroom_name : ""}
-                    {room_data && room_data.chatroom_admin === user.user_id ? <button className="edit-button"><Link to={`/chatroom/${room_id}/edit`}>Editer</Link></button>: ""}
+                    {chat_data && chat_data.type === "chatroom" ? <ChatroomHeader /> : ""}
+                    {chat_data && chat_data.type === "private_room" ? <PrivateConversationHeader /> : ""}
                 </header>
                 <main className="chat-main">
-                    <UserList users={users}/>
+                    <UserList users={users} show={chat_data && chat_data.type === "chatroom"}/>
                     <main className="messages-container">
                         <MessagesContainer messages={chat_messages}/>
                         <ChatForm sendMessage={sendMessage}/>

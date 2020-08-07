@@ -4,21 +4,20 @@ import {UserContext} from "./App.js";
 
 import Home from "./components/Home.js";
 
-import Login    from "./components/Authentication/Login.js";
-import Register from "./components/Authentication/Register.js";
+import Login        from "./components/Authentication/Login.js";
+import Register     from "./components/Authentication/Register.js";
 
-import Upload from "./components/Posts/Upload.js";
-import Edit   from "./components/Posts/Edit.js";
-import Post   from "./components/Posts/Post.js";
-import Posts  from "./components/Posts/Posts.js";
+import Upload       from "./components/Posts/Upload.js";
+import Edit         from "./components/Posts/Edit.js";
+import Post         from "./components/Posts/Post.js";
+import Posts        from "./components/Posts/Posts.js";
 
-import User      from "./components/Users/User.js";
-import Users     from "./components/Users/Users.js";
-import Dashboard from "./components/Users/Dashboard.js";
+import User         from "./components/Users/User.js";
+import Users        from "./components/Users/Users.js";
+import Dashboard    from "./components/Users/Dashboard.js";
 
 import Chatrooms    from "./components/Chats/Chatrooms.js";
 import Chatroom     from "./components/Chats/Chatroom.js";
-import PrivateChat  from "./components/Chats/PrivateChat.js";
 import ChatroomEdit from "./components/Chats/ChatroomEdit.js";
 
 function MyAccountRedirection() {
@@ -74,9 +73,9 @@ export default function Routes() {
                 <Route path="/dashboard" exact component={Dashboard} /> 
 
                 <Route path="/chatrooms" exact component={Chatrooms} /> 
-                <Route path="/chatroom/:room_id" exact component={Chatroom} /> 
                 <Route path="/chatroom/:room_id/edit" exact component={ChatroomEdit} /> 
-                <Route path="/private-message/:room_id" exact component={PrivateChat} /> 
+                <Route path="/chatroom/:room_id" exact component={Chatroom}/> 
+                <Route path="/private-message/:user_to" exact component={Chatroom}/> 
 
 
             </React.Fragment>: <React.Fragment>
