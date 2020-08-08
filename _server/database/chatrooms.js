@@ -135,7 +135,7 @@ async function removePrivateMessage(user_from, message_id) {
     return db.exec(query, [message_id, user_from]);
 }
 
-async function getPrivateMessages(user1, user2, {start, step}) { // PAS FINI
+async function getPrivateMessages(from, to, {start, step}) {
 
     if(start === undefined) {
         start = 0;
@@ -146,15 +146,17 @@ async function getPrivateMessages(user1, user2, {start, step}) { // PAS FINI
     }
 
     const query = `
-        SELECT mp_content, mp_date, mp_from, mp_to, user_name
+        SELECT mp_content, mp_date,
+        mp_from, mp_to, user_name,
+        user_avatar
         FROM rs_private_messages
         FULL JOIN rs_users
-        ON mp_from = user_id OR mp_to = user_id
+        ON mp_from = user_id
         WHERE (mp_from = ? AND mp_to = ?) OR (mp_from = ? AND mp_to = ?)
         ORDER BY mp_date DESC 
         LIMIT ?, ?`;
 
-    return db.exec(query, [user1, user2, user2, user1, start, step]);
+    return db.exec(query, [from, to, to, from, start, step]);
 }
 
 function sendMessage(user_id, chatroom_id, content) {
@@ -197,7 +199,7 @@ async function getMessages(chatroom_id, {start, step}) {
 }
 
 //GRANTS
-function grantUser(user_id, chatroom_id) {
+function grantUser(chatroom_id, user_id) {
     //!\ NO PROTECTION: use "isAdmin" to see if the grant is allowed
     const query = `
         INSERT INTO rs_chatroom_grants (grant_chatroom, grant_user)
@@ -206,7 +208,7 @@ function grantUser(user_id, chatroom_id) {
     return db.exec(query, [chatroom_id, user_id])
 }
 
-function removeGrant(user_id, chatroom_id) {
+function removeGrant(chatroom_id, user_id) {
     //!\ NO PROTECTION: use "isAdmin" to see if the grant is allowed
     const query = `
         DELETE FROM rs_chatroom_grants
@@ -219,8 +221,10 @@ function removeGrant(user_id, chatroom_id) {
 //GET
 function getAllowedUsers(chatroom_id) {
     const query = `
-        SELECT grant_user
-        FROM rs_chatroom_grants
+        SELECT grant_user, user_name,
+        user_avatar, user_id, user_registration
+        FROM rs_chatroom_grants FULL JOIN rs_users
+        ON user_id = grant_user
         WHERE grant_chatroom = ?`;
     
     return db.exec(query, [chatroom_id]);

@@ -36,6 +36,27 @@ router.get("/chatroom/:chat_id", async(req, res) => {
     res.json(data[0]);
 });
 
+router.get("/chatroom/:chatroom_id/grants", async(req, res)=> {
+    // We only give the allowed users to the owner
+    const is_admin = await chatrooms.isChatroomAdmin(req.params.chatroom_id, req.user.user_id);
+
+    if(!is_admin) {
+        res.status(400);
+        res.end();
+        return;
+    }
+
+    const {error, data} = await chatrooms.getAllowedUsers(req.params.chatroom_id);
+
+    if(error) {
+        res.status(500);
+        res.end();
+        return;
+    }
+
+    res.json(data);
+});
+
 //POST
 router.post("/chatrooms", async(req, res) => {
     //Get and validtate the request's form
@@ -69,6 +90,36 @@ router.post("/chatrooms", async(req, res) => {
     res.json(data.insertId);
 });
 
+router.post("/chatroom/:chatroom_id/grants", async(req, res)=> {
+    // Only allow the owner to add grants
+    const is_admin = await chatrooms.isChatroomAdmin(req.params.chatroom_id, req.user.user_id);
+
+    if(!is_admin) {
+        res.status(400);
+        res.end();
+        return;
+    }
+
+    //get the user to grant
+    const {user} = req.body;
+
+    if(user === undefined) {
+        res.status(400);
+        res.end();
+        return;
+    }
+
+    // Add the grant
+    const {error} = await chatrooms.grantUser(req.params.chatroom_id, user);
+
+    if(error) {
+        res.status(500);
+        res.end();
+    } else {
+        res.end();
+    }
+});
+
 //DELETE
 router.delete("/chatroom/:chatroom_id", async(req, res) => {
     const {chatroom_id} = req.params;
@@ -81,6 +132,27 @@ router.delete("/chatroom/:chatroom_id", async(req, res) => {
     }
 
     res.end();
+});
+
+router.delete("/chatroom/:chatroom_id/grant/:user_id", async(req, res)=> {
+    // Only allow the owner to remove grants
+    const is_admin = await chatrooms.isChatroomAdmin(req.params.chatroom_id, req.user.user_id);
+
+    if(!is_admin) {
+        res.status(400);
+        res.end();
+        return;
+    }
+
+    // Remove the grant
+    const {error} = await chatrooms.removeGrant(req.params.chatroom_id, req.params.user_id);
+
+    if(error) {
+        res.status(500);
+        res.end();
+    } else {
+        res.end();
+    }
 });
 
 //PATCH

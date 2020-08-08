@@ -47,7 +47,10 @@ class ChatApp {
                     const last_messages = await chatrooms.getMessages(room_id, {start: 0, step: 30});
 
                     // Emit the last 30 messages to the client
-                    socket.emit("last-messages", last_messages.data);
+                    if(!last_messages.error) {
+                        const formated_last_messages = this.dbToChatroomMessages(last_messages.data);
+                        socket.emit("last-messages", formated_last_messages);
+                    }
 
                     // Updating the user list for everyone
                     this.updateUserList(room_id);
@@ -67,8 +70,13 @@ class ChatApp {
 
                     this.sockets.push(socket);
 
-                    // TODO: Add a "getPrivateMessages".
-                    console.log("added user")
+                    // Send the last 30 messages
+                    const last_messages = await chatrooms.getPrivateMessages(socket.user_to, socket.user.user_id, {start: 0, step: 30});
+
+                    if(!last_messages.error) {
+                        const formated_last_messages = this.dbToPrivateMessages(last_messages.data);
+                        socket.emit("last-messages", formated_last_messages);
+                    }
                 }
             });
 
@@ -82,8 +90,6 @@ class ChatApp {
 
             socket.on("message", async(msg) => {
                 if(socket.user === undefined) return;
-
-                console.log(`${socket.user.user_name} à envoyé "${msg}" a ${socket.user_to}`)
 
                 // Validate the form, send the messages to the sockets,
                 // add the message to the database
@@ -146,6 +152,7 @@ class ChatApp {
 
         this.sendToUser(socket.user_to, "message", message);
 
+        console.log("message sent")
         socket.emit("message", message);
     }
 
@@ -164,6 +171,44 @@ class ChatApp {
                 this.sockets[i].emit(event_name, data);
             }
         }
+    }
+
+    // Utils functions to format database's data to the format
+    // used by the client app
+    dbToChatroomMessages(message_list) {
+        let messages = [];
+
+        for(let i = 0; i < message_list.length; i++) {
+            messages.push({
+                content: message_list[i].message_content,
+                user: {
+                    user_id: message_list[i].user_id,
+                    user_avatar: message_list[i].user_avatar,
+                    user_name: message_list[i].user_name
+                },
+                date: message_list[i].message_date
+            });
+        }
+
+        return messages;
+    }
+
+    dbToPrivateMessages(message_list) {
+        let messages = [];
+
+        for(let i = 0; i < message_list.length; i++) {
+            messages.push({
+                content: message_list[i].mp_content,
+                user: {
+                    user_id: message_list[i].mp_from,
+                    user_avatar: message_list[i].user_avatar,
+                    user_name: message_list[i].user_name
+                },
+                date: message_list[i].mp_date
+            });
+        }
+        
+        return messages;
     }
 }
 

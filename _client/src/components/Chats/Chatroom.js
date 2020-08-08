@@ -166,23 +166,7 @@ export default function Chatroom() {
     React.useEffect(() => {
         socket.on("chat_error", err => console.log(err));
 
-        socket.on("last-messages", (message_list) => {
-            let messages = [];
-
-            // We reformat the messages data to the
-            // format used by the app
-            for(let i = 0; i < message_list.length; i++) {
-                messages.push({
-                    content: message_list[i].message_content,
-                    user: {
-                        user_id: message_list[i].user_id,
-                        user_avatar: message_list[i].user_avatar,
-                        user_name: message_list[i].user_name
-                    },
-                    date: message_list[i].message_date
-                });
-            }
-
+        socket.on("last-messages", (messages) => {
             setChatMessages(messages);
         });
 
@@ -190,7 +174,9 @@ export default function Chatroom() {
             setUsers(new_users);
         });
 
-        socket.on("message", addMessage);
+        socket.on("message", (msg) => {
+            addMessage(msg);
+        });
     // eslint-disable-next-line
     });
 
