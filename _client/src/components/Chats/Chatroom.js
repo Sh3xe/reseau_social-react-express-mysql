@@ -3,7 +3,7 @@ import React from "react";
 import io from "socket.io-client";
 import {useParams, Link} from "react-router-dom";
 import {UserContext} from "../../App.js";
-import {formatDate} from "../../utils.js";
+import {formatDate, getMinutesSince} from "../../utils.js";
 
 const socket = io("http://localhost:8080");
 
@@ -63,16 +63,41 @@ function MessagesContainer({messages}) {
 
 function UserList({users, show}) {
 
-    if(show === false) return <div></div>;
+    const [users_interval, setUsersInterval] = React.useState(null);
 
-    let users_el = [];
+    const [users_el, setUsersEl] = React.useState("");
 
-    for(let i = 0; i < users.length; i++) {
-        const u = users[i];
-        users_el.push(
-            <li key={i}><img src={`/${u.user_avatar}`} alt="" /> <Link to={`/user/${u.user_id}`}>{u.user_name}</Link> <span className="since-date">Depuis 120m</span></li>
-        );
+    const getUsersEl = function() {
+        let new_users_el = [];
+
+        for(let i = 0; i < users.length; i++) {
+            const u = users[i];
+            new_users_el.push(
+                <li key={i}>
+                    <img src={`/${u.user_avatar}`} alt="" />
+                    <Link to={`/user/${u.user_id}`}>{u.user_name}</Link>
+                    <span className="since-date">Depuis {getMinutesSince(u.join_time) }m</span>
+                </li>
+            );
+        }
+
+        setUsersEl(new_users_el);
     }
+
+    React.useEffect(() => {
+        if(users_interval) clearInterval(users_interval);
+
+        getUsersEl();
+
+        setUsersInterval(() => {
+            setInterval(getUsersEl, 60 * 1000);
+        });
+
+        return () => clearInterval(users_interval);
+// eslint-disable-next-line
+    }, [users]);
+
+    if(show === false) return <div></div>;
 
     return (
     <aside className="chat-aside">

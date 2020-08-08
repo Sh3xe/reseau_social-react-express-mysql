@@ -102,6 +102,14 @@ export function formatDate(str_d) {
 	return `${day}/${month}/${year}, ${hours}h${minutes}`;
 }
 
+function getTimeSince(date) {
+    return new Date().getTime() - new Date(date).getTime();
+}
+
+export function getMinutesSince(date) {
+    return Math.floor(getTimeSince(date) / 60000);
+}
+
 //export function escapeHtmlTags(string) {
 //    if (string)
 //        return string.replace(/</g, "&lt;").replace(/>/g, "&gt;");

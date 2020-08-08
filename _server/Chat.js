@@ -40,6 +40,7 @@ class ChatApp {
                     // and we add him to the sockets list
                     socket.user = user.data;
                     socket.room = room_id;
+                    socket.join_time = new Date();
 
                     this.sockets.push(socket);
                     
@@ -81,10 +82,17 @@ class ChatApp {
             });
 
             socket.on("disconnect", () => {
+                if(socket.room !== undefined)
+                    this.updateUserList(socket.room);
+
                 this.removeSocket(socket);
+                
             });
 
             socket.on("chat-exit", () => {
+                if(socket.room !== undefined)
+                    this.updateUserList(socket.room);
+
                 this.removeSocket(socket);
             });
 
@@ -118,17 +126,21 @@ class ChatApp {
     removeSocket(socket) {
         if(socket.user !== undefined) {
             this.sockets = this.sockets.filter(s => {
-                s.user.user_token !== socket.user.user_token;
+                return (s.user.user_token !== socket.user.user_token && s.join_time !== socket.join_time);
             });
         }
     }
     
     updateUserList(room_id) {
+        console.log("updating room users")
         let users = [];
-        
+
         for(let i = 0; i < this.sockets.length; i++) {
             if(this.sockets[i].room === room_id) {
-                users.push(this.sockets[i].user);
+                users.push({
+                    ...this.sockets[i].user,
+                    join_time: this.sockets[i].join_time
+                });
             }
         }
         
