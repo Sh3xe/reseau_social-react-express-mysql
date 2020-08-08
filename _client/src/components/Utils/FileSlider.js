@@ -1,10 +1,9 @@
 import React from  "react";
 
-function Page({files, selected}) {
+function File({file, show}) {
     //get the file obj and the filetype form the mimetype
-    const file = files[selected];
     const type = file.file_mime.split("/")[0];
-    let content = undefined;
+    let content;
 
     //get the right element depending on the filetype
     switch(type) {
@@ -24,8 +23,26 @@ function Page({files, selected}) {
     }
 
     return (
+        <React.Fragment>
+            { show ?
+                content : ""
+            }
+        </React.Fragment>
+    );
+}
+
+function Page({files, selected}) {
+    let files_el = [];
+
+    for(let i = 0; i < files.length; i++) {
+        files_el.push(
+            <File key={i} file={files[i]} show={ i === selected}/>
+        )
+    }
+
+    return (
         <div className="slider">
-            {content}
+            {files_el}
         </div>
     );
 }
