@@ -1,3 +1,5 @@
+import {emoji_list} from "./config.js";
+
 //Old
 export function sendBody(url, body) {
 
@@ -110,18 +112,31 @@ export function getMinutesSince(date) {
     return Math.floor(getTimeSince(date) / 60000);
 }
 
-//export function escapeHtmlTags(string) {
-//    if (string)
-//        return string.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-//    else return "";
-//}
-//
-//export function parseMessages(str) {
-//    return str.replace(    /\*(.*?)\*/gi, '<span style="font-style: italic">$1</span>')
-//              .replace(/\*\*(.*?)\*\*/gi, '<span style="font-weight: bold" >$1</span>');
-//}
-//
-//export function escapeAndParse(str) {
-//    str = escapeHtmlTags(str);
-//    return parseMessages(str);
-//}
+function escapeHtmlTags(string) {
+    if (string)
+        return string.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    else return "";
+}
+
+function parseEmojis(str) {
+    for(let emoji of emoji_list) {
+        str = str.replace(`:${emoji.name}:`, `<img src="/emojis/${emoji.path}" alt="" class="emoji"/>`);
+    }
+
+    return str;
+}
+
+function parseMessages(str) {
+    return str.replace(/\n/g, `<br>`)
+              .replace(/ /g, `&nbsp;`)
+              .replace(/__(.*?)__/gi, `<span class="underline-block">$1</span>`)
+              .replace(/\*(.*?)\*/gi, `<span class="italic-block">$1</span>`)
+              .replace(/\*\*(.*?)\*\*/gi, `<span class="big-block">$1</span>`)
+              .replace(/```(.*?)```/gi, `<div class="code-block">$1</div>`);
+}
+
+export function escapeAndParse(str) {
+    str = escapeHtmlTags(str);
+    str = parseMessages(str);
+    return parseEmojis(str);
+}

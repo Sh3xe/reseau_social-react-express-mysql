@@ -4,7 +4,7 @@ import {Link, useParams} from "react-router-dom";
 import Message from "../Utils/Message.js";
 import {sendForm} from "../../utils.js";
 import {UserContext} from "../../App.js";
-import {formatDate, getUrlQuery} from "../../utils.js";
+import {formatDate, getUrlQuery, escapeAndParse} from "../../utils.js";
 
 function UserPost({post}) {
     return (
@@ -136,7 +136,7 @@ function Bio({bio, color}) {
     return (
         <div className="user-bio">
             <div className="userbio-head" style={{background: color}}>Bio</div>
-            <div className="userbio-content">{bio}</div>
+            <div className="userbio-content" dangerouslySetInnerHTML={{__html: escapeAndParse(bio)}}></div>
         </div>
     );
 }

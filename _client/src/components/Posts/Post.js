@@ -1,7 +1,7 @@
 import React from "react";
 
 import {Link} from "react-router-dom";
-import {formatDate, sendForm, getUrlQuery} from "../../utils.js";
+import {formatDate, sendForm, getUrlQuery, escapeAndParse} from "../../utils.js";
 import {UserContext} from "../../App.js";
 
 import FileSlider from "../Utils/FileSlider.js";
@@ -86,7 +86,7 @@ function Comment({comment, refresh}) {
                         value={state.comment_content}
                         onChange={handleCommentChange}
                     ></textarea> :
-                    comment.comment_content
+                    <div dangerouslySetInnerHTML={{__html: escapeAndParse(comment.comment_content)}}></div>
                 }
             </div>
         </div>
@@ -352,7 +352,7 @@ function PostContent({post, files}) {
         <FileSlider className="" files={files}/>
         <div className="post-content"> 
         {files.length ? <hr /> : ""}
-        {post.post_content} 
+        <div dangerouslySetInnerHTML={{__html: escapeAndParse(post.post_content)}}></div>
         </div>
     </div>);
 }

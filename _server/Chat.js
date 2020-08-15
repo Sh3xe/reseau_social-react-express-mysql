@@ -29,6 +29,7 @@ class ChatApp {
 
                 // If the user connects to a chatroom
                 if(room_id !== undefined) {
+
                     const is_allowed = await chatrooms.isUserAllowed(user.data.user_id, room_id);
                     
                     if(!is_allowed) {
@@ -132,7 +133,6 @@ class ChatApp {
     }
     
     updateUserList(room_id) {
-        console.log("updating room users")
         let users = [];
 
         for(let i = 0; i < this.sockets.length; i++) {

@@ -5,7 +5,7 @@
 
 body{
     margin: 0;
-    font-family: "Open sans", "Montserrat", sans-serif;
+    font-family: sans-serif;
     background-color: rgb(240, 240, 240);
     height: 100%;
 }
@@ -52,6 +52,33 @@ input[type=color]:hover {
 button a {
     text-decoration: none;
     color: inherit;
+}
+
+/*Messages parsing*/
+
+img.emoji {
+    width: 30px;
+    height: 30px;
+}
+
+div.code-block {
+    font-family: "Roboto Mono";
+    background-color: rgb(185, 185, 185);
+    border-radius: 4px;
+    margin: 5px;
+    padding: 5px;
+}
+
+span.big-block {
+    font-weight: bold;
+}
+
+span.underline-block {
+    text-decoration: underline;
+}
+
+span.italic-block {
+    font-style: italic;
 }
 
 /*HEADER*/

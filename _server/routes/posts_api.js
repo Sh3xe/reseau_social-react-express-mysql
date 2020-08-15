@@ -110,9 +110,9 @@ router.post("/upload", async(req, res) => {
         if(!failed) {
             const post_add = await posts.add(title, content, req.user.user_id, category);
             const files_add = await files.add(req.files, post_add.last_id);
-
+    
             if(!post_add.error && !files_add.error) {
-                res.json(post_add.data[0].insertId);
+                res.json(post_add.data.insertId);
                 return;
             }
         }
